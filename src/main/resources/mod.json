@@ -1,0 +1,6 @@
+{
+    "main": "com.englishtown.vertx.solr.SolrVerticle",
+    "auto-redeploy": true,
+    "worker": true,
+    "multi-threaded": true
+}
