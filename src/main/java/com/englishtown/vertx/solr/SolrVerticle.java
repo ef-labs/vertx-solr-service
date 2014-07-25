@@ -22,6 +22,8 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
 
     public static String FIELD_ACTION = "action";
     public static String FIELD_QUERY = "query";
+    public static String FIELD_PAGE = "page";
+    public static long PAGE_SIZE = 1000;
 
     private String address;
     private SolrServer solrServer;
@@ -92,11 +94,18 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
             return;
         }
 
+        long page = message.body().getNumber(FIELD_PAGE, 0).longValue();
         SolrQuery query = serializer.deserialize(json);
 
         try {
             QueryResponse response = solrServer.query(query);
-            SolrDocumentList results = response.getResults();
+
+            long offset = PAGE_SIZE * page;
+            final SolrDocumentList results = response.getResults();
+            final long totalItems = results.getNumFound();
+
+            query.setStart((int) offset);
+            query.setRows((int) PAGE_SIZE);
 
             JsonArray docs = new JsonArray();
             for (SolrDocument result : results) {
@@ -111,8 +120,9 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
 
             JsonObject reply = new JsonObject()
                     .putNumber("max_score", results.getMaxScore())
-                    .putNumber("number_found", results.getNumFound())
-                    .putNumber("start", results.getNumFound())
+                    .putNumber("number_found", totalItems)
+                    .putNumber("page", page)
+                    .putNumber("start", offset)
                     .putArray("docs", docs);
 
             sendOK(message, reply);
