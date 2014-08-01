@@ -25,8 +25,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class OffsetReadJsonStreamTest {
 
-    OffsetReadJsonStream offsetReadJsonStream;
-    String address = SolrVerticle.DEFAULT_ADDRESS;
+    NewOffsetReadJsonStream offsetReadJsonStream;
+    final String address = SolrVerticle.DEFAULT_ADDRESS;
 
     // contains the json query object we pass to Solr
     JsonObject queryMessage = new JsonObject();
@@ -54,7 +54,7 @@ public class OffsetReadJsonStreamTest {
         SolrQuery query = new SolrQuery()
                 .setQuery("start_date:*").setRows(25);
 
-        offsetReadJsonStream = new OffsetReadJsonStream(query, serializer, eventBus, address);
+        offsetReadJsonStream = new NewOffsetReadJsonStream(query, serializer, eventBus, address);
         offsetReadJsonStream.exceptionHandler(exceptionHandler);
         offsetReadJsonStream.endHandler(endHandler);
 
@@ -72,6 +72,7 @@ public class OffsetReadJsonStreamTest {
         messageBody
                 .putString("status", "ok")
                 .putNumber("number_found", 50)
+                .putString("next_cursor_mark","test_cursor")
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
                                 .putString("test_session_id", "60e8a540-1323-11e4-93d8-e3c7cf74f423")
@@ -187,6 +188,7 @@ public class OffsetReadJsonStreamTest {
                 .putString("status", "ok")
                         // pretending we have more results than we do in order to trigger the 2nd loop of doQuery
                 .putNumber("number_found", 3)
+                .putString("next_cursor_mark","test_cursor")
                         // empty array, which should trigger the endHandler
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
@@ -207,8 +209,8 @@ public class OffsetReadJsonStreamTest {
 
         // empty "docs" array, which should trigger the endHandler
         messageBody
+                .putString("next_cursor_mark","test_cursor")
                 .putArray("docs", new JsonArray());
-
         replyHandlerCaptor.getValue().handle(jsonMessage);
 
         verifyZeroInteractions(exceptionHandler);

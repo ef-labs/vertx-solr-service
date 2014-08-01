@@ -19,10 +19,10 @@ import java.util.Date;
  */
 public class SolrVerticle extends BusModBase implements Handler<Message<JsonObject>> {
 
-    public static String DEFAULT_ADDRESS = "et.solr.address";
+    public static final String DEFAULT_ADDRESS = "et.solr.address";
 
-    public static String FIELD_ACTION = "action";
-    public static String FIELD_QUERY = "query";
+    public static final String FIELD_ACTION = "action";
+    public static final String FIELD_QUERY = "query";
 
     private String address;
     private SolrServer solrServer;
@@ -61,6 +61,7 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
      * Event bus json message handler
      *
      * @param message
+     * The query message sent to Solr
      */
     @Override
     public void handle(Message<JsonObject> message) {

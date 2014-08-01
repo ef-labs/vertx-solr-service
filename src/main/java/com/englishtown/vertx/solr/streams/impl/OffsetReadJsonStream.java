@@ -7,7 +7,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.file.AsyncFile;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.core.logging.impl.LoggerFactory;
@@ -150,9 +149,6 @@ public class OffsetReadJsonStream implements ReadJsonStream<OffsetReadJsonStream
                 }
             }
 
-        }
-        else {
-            handleException(new RuntimeException("Invalid Json: " + reply.toString()));
         }
 
     }

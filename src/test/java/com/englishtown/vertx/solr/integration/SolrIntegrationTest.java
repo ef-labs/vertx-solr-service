@@ -26,13 +26,13 @@ import static org.vertx.testtools.VertxAssert.*;
  */
 public class SolrIntegrationTest extends TestVerticle {
 
-    private SolrQuerySerializer serializer = new DefaultSolrQuerySerializer();
+    private final SolrQuerySerializer serializer = new DefaultSolrQuerySerializer();
 
     OffsetReadJsonStream defaultReadJsonStream;
     AbstractWriteJsonStream abstractWriteJsonStream;
     SolrPump solrPump;
 
-    String address = SolrVerticle.DEFAULT_ADDRESS;
+    final String address = SolrVerticle.DEFAULT_ADDRESS;
     SolrQuery query = new SolrQuery();
 
 
@@ -78,6 +78,7 @@ public class SolrIntegrationTest extends TestVerticle {
              * Something has happened, so handle it.
              *
              * @param reply
+             * The json reply from Solr
              */
             @Override
             public void handle(Message<JsonObject> reply) {

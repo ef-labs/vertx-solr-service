@@ -110,7 +110,6 @@ public class CursorMarkReadJsonStream implements ReadJsonStream<CursorMarkReadJs
         if (exceptionHandler != null) {
             exceptionHandler.handle(t);
         }
-        // TODO: Call endHandler on exception?
     }
 
     private void handleReply(JsonObject reply) {
