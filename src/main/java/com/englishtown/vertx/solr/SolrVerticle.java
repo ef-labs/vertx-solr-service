@@ -12,6 +12,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import javax.inject.Inject;
+import java.util.Date;
 
 /**
  * Solr client worker verticle
@@ -95,6 +96,7 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
         SolrQuery query = serializer.deserialize(json);
 
         try {
+
             QueryResponse response = solrServer.query(query);
             SolrDocumentList results = response.getResults();
 
@@ -103,7 +105,8 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
                 JsonObject doc = new JsonObject();
 
                 for (String key : result.keySet()) {
-                    doc.putValue(key, result.getFieldValue(key));
+                    Object val = result.getFieldValue(key);
+                    doc.putValue(key, getJsonValue(key, result));
                 }
 
                 docs.addObject(doc);
@@ -112,14 +115,31 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
             JsonObject reply = new JsonObject()
                     .putNumber("max_score", results.getMaxScore())
                     .putNumber("number_found", results.getNumFound())
-                    .putNumber("start", results.getNumFound())
+                    .putNumber("start", results.getStart())
                     .putArray("docs", docs);
+
+            // Solr CursorsMarks are supported as of version 4.7.0
+            if (response.getNextCursorMark() != null && !response.getNextCursorMark().isEmpty()) {
+                reply.putString("next_cursor_mark", response.getNextCursorMark());
+            }
 
             sendOK(message, reply);
 
         } catch (Exception e) {
             sendError(message, "Error querying solr server: " + e.getMessage(), e);
         }
+
+    }
+
+    private Object getJsonValue(String key, SolrDocument result) {
+
+        Object val = result.getFieldValue(key);
+
+        if (val instanceof Date) {
+            return ((Date)val).getTime();
+        }
+
+        return val;
 
     }
 
