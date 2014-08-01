@@ -4,7 +4,6 @@ import com.englishtown.vertx.solr.SolrQuerySerializer;
 import com.englishtown.vertx.solr.SolrVerticle;
 import com.englishtown.vertx.solr.impl.DefaultSolrQuerySerializer;
 import com.englishtown.vertx.solr.streams.impl.AbstractWriteJsonStream;
-import com.englishtown.vertx.solr.streams.impl.CursorMarkReadJsonStream;
 import com.englishtown.vertx.solr.streams.impl.OffsetReadJsonStream;
 import com.englishtown.vertx.solr.streams.impl.SolrPump;
 import org.apache.solr.client.solrj.SolrQuery;

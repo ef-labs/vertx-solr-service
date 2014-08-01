@@ -17,7 +17,6 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 /**
  * Unit tests for {@link com.englishtown.vertx.solr.streams.impl.SolrPump}

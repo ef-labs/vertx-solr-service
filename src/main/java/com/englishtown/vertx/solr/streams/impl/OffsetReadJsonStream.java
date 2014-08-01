@@ -2,21 +2,22 @@ package com.englishtown.vertx.solr.streams.impl;
 
 import com.englishtown.vertx.solr.SolrQuerySerializer;
 import com.englishtown.vertx.solr.SolrVerticle;
-import com.englishtown.vertx.solr.logger.SolrLogger;
-import com.englishtown.vertx.solr.logger.SolrLoggerFactory;
 import com.englishtown.vertx.solr.streams.ReadJsonStream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.file.AsyncFile;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 
 /**
  * Default implementation of {@link com.englishtown.vertx.solr.streams.ReadJsonStream}
  */
 public class OffsetReadJsonStream implements ReadJsonStream<OffsetReadJsonStream> {
 
-    private static final SolrLogger logger = SolrLoggerFactory.getSolrLogger(OffsetReadJsonStream.class);
+    private static final Logger log = LoggerFactory.getLogger(OffsetReadJsonStream.class);
 
     private final SolrQuery query;
     private final SolrQuerySerializer serializer;
@@ -120,7 +121,7 @@ public class OffsetReadJsonStream implements ReadJsonStream<OffsetReadJsonStream
         if (exceptionHandler != null) {
             exceptionHandler.handle(t);
         } else {
-            logger.error("Unhandled Exception", t);
+            log.error("Unhandled Exception", t);
         }
     }
 
@@ -135,7 +136,7 @@ public class OffsetReadJsonStream implements ReadJsonStream<OffsetReadJsonStream
 
             nextOffset += count;
 
-            if (dataHandler != null) {
+            if (dataHandler != null && numberFound != 0) {
                 dataHandler.handle(reply);
             }
 

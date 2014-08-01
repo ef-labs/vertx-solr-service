@@ -105,7 +105,6 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
                 JsonObject doc = new JsonObject();
 
                 for (String key : result.keySet()) {
-                    Object val = result.getFieldValue(key);
                     doc.putValue(key, getJsonValue(key, result));
                 }
 
