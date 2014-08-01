@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class OffsetReadJsonStreamTest {
 
-    NewOffsetReadJsonStream offsetReadJsonStream;
+    NewCursorMarkReadJsonStream offsetReadJsonStream;
     final String address = SolrVerticle.DEFAULT_ADDRESS;
 
     // contains the json query object we pass to Solr
@@ -54,7 +54,7 @@ public class OffsetReadJsonStreamTest {
         SolrQuery query = new SolrQuery()
                 .setQuery("start_date:*").setRows(25);
 
-        offsetReadJsonStream = new NewOffsetReadJsonStream(query, serializer, eventBus, address);
+        offsetReadJsonStream = new NewCursorMarkReadJsonStream(query, serializer, eventBus, address);
         offsetReadJsonStream.exceptionHandler(exceptionHandler);
         offsetReadJsonStream.endHandler(endHandler);
 
@@ -72,7 +72,7 @@ public class OffsetReadJsonStreamTest {
         messageBody
                 .putString("status", "ok")
                 .putNumber("number_found", 50)
-                .putString("next_cursor_mark","test_cursor")
+                .putString("next_cursor_mark", "test_cursor")
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
                                 .putString("test_session_id", "60e8a540-1323-11e4-93d8-e3c7cf74f423")
@@ -187,8 +187,8 @@ public class OffsetReadJsonStreamTest {
         messageBody
                 .putString("status", "ok")
                         // pretending we have more results than we do in order to trigger the 2nd loop of doQuery
-                .putNumber("number_found", 3)
-                .putString("next_cursor_mark","test_cursor")
+                .putNumber("number_found", 4)
+                .putString("next_cursor_mark", "test_cursor")
                         // empty array, which should trigger the endHandler
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
@@ -207,9 +207,22 @@ public class OffsetReadJsonStreamTest {
         verifyZeroInteractions(exceptionHandler);
         verifyZeroInteractions(endHandler);
 
+        // update test_cursor
+        messageBody
+                .putString("next_cursor_mark", "test_cursor2")
+                .putArray("docs", new JsonArray()
+                        .addObject(new JsonObject()
+                                .putString("test_session_id", "9023udj2-1312-1ld1-lvd3-989fu1dmnsfm")
+                                .putString("status", "created")
+                                .putString("start_date", "1407337289472")));
+        replyHandlerCaptor.getValue().handle(jsonMessage);
+
+        verifyZeroInteractions(exceptionHandler);
+        verifyZeroInteractions(endHandler);
+
         // empty "docs" array, which should trigger the endHandler
         messageBody
-                .putString("next_cursor_mark","test_cursor")
+                .putString("next_cursor_mark", "test_cursor2")
                 .putArray("docs", new JsonArray());
         replyHandlerCaptor.getValue().handle(jsonMessage);
 
