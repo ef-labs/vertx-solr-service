@@ -13,6 +13,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import javax.inject.Inject;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Solr client worker verticle
@@ -60,8 +61,7 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
     /**
      * Event bus json message handler
      *
-     * @param message
-     * The query message sent to Solr
+     * @param message The query message sent to Solr
      */
     @Override
     public void handle(Message<JsonObject> message) {
@@ -106,7 +106,7 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
                 JsonObject doc = new JsonObject();
 
                 for (String key : result.keySet()) {
-                    doc.putValue(key, getJsonValue(key, result));
+                    doc.putValue(key, getJsonValue(result.getFieldValue(key)));
                 }
 
                 docs.addObject(doc);
@@ -131,12 +131,18 @@ public class SolrVerticle extends BusModBase implements Handler<Message<JsonObje
 
     }
 
-    private Object getJsonValue(String key, SolrDocument result) {
-
-        Object val = result.getFieldValue(key);
+    private Object getJsonValue(Object val) {
 
         if (val instanceof Date) {
-            return ((Date)val).getTime();
+            return ((Date) val).getTime();
+        }
+
+        if (val instanceof List) {
+            JsonArray arr = new JsonArray();
+            for (Object v : (Iterable) val) {
+                arr.add(getJsonValue(v));
+            }
+            return arr;
         }
 
         return val;

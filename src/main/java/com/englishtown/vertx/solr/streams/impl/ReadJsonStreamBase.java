@@ -15,9 +15,9 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 /**
  * Base implementation of {@link com.englishtown.vertx.solr.streams.ReadJsonStream}
  */
-public abstract class BaseReadJsonStream implements ReadJsonStream<BaseReadJsonStream> {
+public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implements ReadJsonStream<T> {
 
-    private static final Logger log = LoggerFactory.getLogger(BaseReadJsonStream.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReadJsonStreamBase.class);
 
     private final SolrQuery query;
     private final SolrQuerySerializer serializer;
@@ -27,64 +27,89 @@ public abstract class BaseReadJsonStream implements ReadJsonStream<BaseReadJsonS
     private Handler<Void> endHandler;
     private Handler<JsonObject> dataHandler;
     private Handler<Throwable> exceptionHandler;
+
+    private boolean queryRunning;
     private boolean paused;
 
-    public BaseReadJsonStream(SolrQuery query, SolrQuerySerializer serializer, EventBus eventBus, String address) {
+    protected ReadJsonStreamBase(SolrQuery query, SolrQuerySerializer serializer, EventBus eventBus, String address) {
         this.query = query;
         this.serializer = serializer;
         this.eventBus = eventBus;
         this.address = address;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public BaseReadJsonStream endHandler(Handler<Void> endHandler) {
+    public T endHandler(Handler<Void> endHandler) {
         this.endHandler = endHandler;
-        return this;
+        return (T) this;
     }
 
-    // this method starts the SolrPump.
-    // It takes a dataHandler, which is passed in from the Pump, sets this class's dataHandler equal to the one passed in
-    // and starts the Solr query and begins running through the pagination loops
+    /**
+     * This method starts the SolrPump.
+     * It takes a dataHandler, which is passed in from the Pump, sets this class's dataHandler equal to the one passed in
+     * and starts the Solr query and begins running through the pagination loops
+     *
+     * @param handler
+     * @return
+     */
+    @SuppressWarnings("unchecked")
     @Override
-    public BaseReadJsonStream dataHandler(Handler<JsonObject> handler) {
+    public T dataHandler(Handler<JsonObject> handler) {
         this.dataHandler = handler;
         if (!paused) {
             if (dataHandler != null) {
                 doQuery();
-            } else {
-                // a dataHandler being null will most likely never happen
-                handleException(new RuntimeException("No dataHandler defined!"));
             }
         }
-        return this;
+        return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public BaseReadJsonStream pause() {
+    public T pause() {
         this.paused = true;
-        return this;
+        return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public BaseReadJsonStream resume() {
+    public T resume() {
         if (paused) {
             paused = false;
             if (dataHandler != null) {
                 doQuery();
             }
         }
-        return this;
+        return (T) this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public BaseReadJsonStream exceptionHandler(Handler<Throwable> handler) {
+    public T exceptionHandler(Handler<Throwable> handler) {
         this.exceptionHandler = handler;
-        return this;
+        return (T) this;
     }
 
+    /**
+     * Set the query start point for pagination.  Typically either the start or cursorMark param.
+     *
+     * @param query the SolrQuery object
+     * @return
+     */
     protected abstract ModifiableSolrParams setQueryStart(SolrQuery query);
 
+    // doQuery never knows if something is paused, because it will never come in here if it is paused, yet the counter
+    // will keep incrementing inside the override of handleReply. we need to make handleReply aware of the value of pause
+    // or move the pause check somewhere else.
     private void doQuery() {
+
+        // Don't send a second query if already running
+        if (queryRunning) {
+            return;
+        }
+
+        queryRunning = true;
 
         setQueryStart(query);
 
@@ -94,12 +119,13 @@ public abstract class BaseReadJsonStream implements ReadJsonStream<BaseReadJsonS
                 .putString(SolrVerticle.FIELD_ACTION, SolrVerticle.FIELD_QUERY)
                 .putObject(SolrVerticle.FIELD_QUERY, serializer.serialize(query));
 
-        // we send this functional json message along the event bus which tells it how to handle the reply.
+        // send this json message over the event bus with a reply handler.
         eventBus.send(address, message, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> reply) {
 
                 try {
+                    queryRunning = false;
                     JsonObject body = reply.body();
 
                     if ("ok".equalsIgnoreCase(body.getString("status"))) {
@@ -121,14 +147,18 @@ public abstract class BaseReadJsonStream implements ReadJsonStream<BaseReadJsonS
         if (exceptionHandler != null) {
             exceptionHandler.handle(t);
         } else {
-            log.error("Unhandled Exception", t);
+            logger.error("Unhandled Exception", t);
         }
     }
 
     protected abstract boolean isComplete(JsonObject reply);
 
-    // pagination looping logic - continuously runs through a doQuery loop until all results have been streamed
-    private void handleReply(JsonObject reply) {
+    /**
+     * Pagination looping logic - continuously runs through a doQuery loop until all results have been streamed
+     *
+     * @param reply the JsonObject query reply from Solr
+     */
+    protected void handleReply(JsonObject reply) {
 
         if (dataHandler != null) {
             dataHandler.handle(reply);

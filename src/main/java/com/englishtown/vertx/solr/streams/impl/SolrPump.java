@@ -6,7 +6,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
 /**
- * A Solr implementation the vertx DataPump
+ * A Solr implementation of the vertx Pump using JsonObjects instead of Buffers
  */
 public class SolrPump {
 
@@ -20,7 +20,7 @@ public class SolrPump {
      * Instances of this class read bytes from a {@link com.englishtown.vertx.solr.streams.ReadJsonStream} and write them to
      * a {@link com.englishtown.vertx.solr.streams.WriteJsonStream}.
      * This class can be used to pump from any {@link com.englishtown.vertx.solr.streams.ReadJsonStream} to any {@link com.englishtown.vertx.solr.streams.WriteJsonStream},
-     * e.g. from an {@link com.englishtown.vertx.solr.streams.impl.OffsetReadJsonStream} to an {@link com.englishtown.vertx.solr.streams.impl.AbstractWriteJsonStream},
+     * e.g. from an {@link com.englishtown.vertx.solr.streams.impl.OffsetReadJsonStream} to an {@link WriteJsonStreamBase},
      * <p>
      * Instances of this class are not thread-safe.<p>
      * <p>
@@ -84,7 +84,7 @@ public class SolrPump {
 
     // defining our data handler, which is a functional object (a parameter that has a method attached to it)
     // passed into the start() method for the Pump
-    private final Handler<JsonObject> dataHandler =new Handler<JsonObject>() {
+    private final Handler<JsonObject> dataHandler = new Handler<JsonObject>() {
         public void handle(JsonObject jsonObject) {
             writeJsonStream.write(jsonObject);
             pumped++;

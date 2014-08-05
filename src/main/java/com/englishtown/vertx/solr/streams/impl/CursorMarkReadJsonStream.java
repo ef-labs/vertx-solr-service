@@ -1,136 +1,52 @@
 package com.englishtown.vertx.solr.streams.impl;
 
 import com.englishtown.vertx.solr.SolrQuerySerializer;
-import com.englishtown.vertx.solr.SolrVerticle;
-import com.englishtown.vertx.solr.streams.ReadJsonStream;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.vertx.java.core.Handler;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 
 /**
- * Default implementation of {@link com.englishtown.vertx.solr.streams.ReadJsonStream}
+ * CursorMark implementation of {@link com.englishtown.vertx.solr.streams.impl.ReadJsonStreamBase}
+ * using {@code CursorMark} to paginate json Solr results
  */
-public class CursorMarkReadJsonStream implements ReadJsonStream<CursorMarkReadJsonStream> {
+public class CursorMarkReadJsonStream extends ReadJsonStreamBase<CursorMarkReadJsonStream> {
 
-    private final SolrQuery query;
-    private final SolrQuerySerializer serializer;
-    private final EventBus eventBus;
-    private final String address;
-
-    private Handler<Void> endHandler;
-    private Handler<JsonObject> dataHandler;
-    private Handler<Throwable> exceptionHandler;
+    private String currCursorMark;
     private String nextCursorMark;
-    private boolean paused;
 
     public CursorMarkReadJsonStream(SolrQuery query, SolrQuerySerializer serializer, EventBus eventBus, String address) {
-        this.query = query;
-        this.serializer = serializer;
-        this.eventBus = eventBus;
-        this.address = address;
+        super(query, serializer, eventBus, address);
         this.nextCursorMark = CursorMarkParams.CURSOR_MARK_START;
     }
 
     @Override
-    public CursorMarkReadJsonStream endHandler(Handler<Void> endHandler) {
-        this.endHandler = endHandler;
-        return this;
-    }
+    protected ModifiableSolrParams setQueryStart(SolrQuery query) {
 
-    // this is the method which starts the SolrPump
-    @Override
-    public CursorMarkReadJsonStream dataHandler(Handler<JsonObject> handler) {
-        this.dataHandler = handler;
-        if (dataHandler != null && !paused) {
-            doQuery();
-        }
-        return this;
+        return query.set(CursorMarkParams.CURSOR_MARK_PARAM, this.nextCursorMark);
+
     }
 
     @Override
-    public CursorMarkReadJsonStream pause() {
-        this.paused = true;
-        return this;
+    protected void handleReply(JsonObject reply) {
+
+        this.currCursorMark= this.nextCursorMark;
+        this.nextCursorMark = reply.getString("next_cursor_mark");
+
+        // Recall super
+        super.handleReply(reply);
     }
 
     @Override
-    public CursorMarkReadJsonStream resume() {
-        if (paused) {
-            paused = false;
-            if (dataHandler != null) {
-                doQuery();
-            }
-        }
-        return this;
-    }
+    protected boolean isComplete(JsonObject reply) {
 
-    @Override
-    public CursorMarkReadJsonStream exceptionHandler(Handler<Throwable> handler) {
-        this.exceptionHandler = handler;
-        return this;
-    }
-
-    private void doQuery() {
-
-        query.set(CursorMarkParams.CURSOR_MARK_PARAM, this.nextCursorMark);
-
-        // send Solr a query json object with the query and attributes to signify this is a Solr query, which basically says:
-        // "Here is the action. It is a query. Also, here is the query"
-        JsonObject message = new JsonObject()
-                .putString(SolrVerticle.FIELD_ACTION, SolrVerticle.FIELD_QUERY)
-                .putObject(SolrVerticle.FIELD_QUERY, serializer.serialize(query));
-
-        // we send this message along the event bus and also tell it how to handle the reply.
-        eventBus.send(address, message, new Handler<Message<JsonObject>>() {
-            @Override
-            public void handle(Message<JsonObject> reply) {
-
-                try {
-                    JsonObject body = reply.body();
-
-                    if ("ok".equalsIgnoreCase(body.getString("status"))) {
-                        // if the status is ok from Solr, handle the reply.
-                        handleReply(body);
-                    } else {
-                        handleException(new RuntimeException("Solr event bus query failed: " + body.getString("message")));
-                    }
-
-                } catch (Throwable t) {
-                    handleException(t);
-                }
-            }
-        });
-
-    }
-
-    private void handleException(Throwable t) {
-        if (exceptionHandler != null) {
-            exceptionHandler.handle(t);
-        }
-    }
-
-    private void handleReply(JsonObject reply) {
-
-        String currCursorMark = nextCursorMark;
-        nextCursorMark = reply.getString("next_cursor_mark");
-
-        if (dataHandler != null) {
-            dataHandler.handle(reply);
-        }
+        boolean complete = false;
 
         if (nextCursorMark == null || currCursorMark.equalsIgnoreCase(nextCursorMark)) {
-            if (endHandler != null) {
-                endHandler.handle(null);
-            }
-        } else {
-            if (!paused && dataHandler != null) {
-                doQuery();
-            }
+            complete = true;
         }
+        return complete;
 
     }
-
 }

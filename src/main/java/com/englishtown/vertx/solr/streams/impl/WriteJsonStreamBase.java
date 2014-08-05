@@ -6,12 +6,12 @@ import org.vertx.java.core.Handler;
 /**
  * Abstract default implementation of {@link com.englishtown.vertx.solr.streams.WriteJsonStream}
  */
-public abstract class AbstractWriteJsonStream<T extends AbstractWriteJsonStream> implements WriteJsonStream<T> {
+public abstract class WriteJsonStreamBase<T extends WriteJsonStreamBase> implements WriteJsonStream<T> {
 
     protected Handler<Throwable> exceptionHandler;
     protected Handler<Void> drainHandler;
 
-    protected AbstractWriteJsonStream() {
+    protected WriteJsonStreamBase() {
     }
 
     @SuppressWarnings("unchecked")

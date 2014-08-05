@@ -23,9 +23,9 @@ import static org.mockito.Mockito.*;
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class OffsetReadJsonStreamTest {
+public class ReadJsonStreamTest {
 
-    NewCursorMarkReadJsonStream offsetReadJsonStream;
+    CursorMarkReadJsonStream readJsonStream;
     final String address = SolrVerticle.DEFAULT_ADDRESS;
 
     // contains the json query object we pass to Solr
@@ -54,9 +54,9 @@ public class OffsetReadJsonStreamTest {
         SolrQuery query = new SolrQuery()
                 .setQuery("start_date:*").setRows(25);
 
-        offsetReadJsonStream = new NewCursorMarkReadJsonStream(query, serializer, eventBus, address);
-        offsetReadJsonStream.exceptionHandler(exceptionHandler);
-        offsetReadJsonStream.endHandler(endHandler);
+        readJsonStream = new CursorMarkReadJsonStream(query, serializer, eventBus, address);
+        readJsonStream.exceptionHandler(exceptionHandler);
+        readJsonStream.endHandler(endHandler);
 
         queryMessage = new JsonObject()
                 .putString(SolrVerticle.FIELD_ACTION, SolrVerticle.FIELD_QUERY)
@@ -68,7 +68,7 @@ public class OffsetReadJsonStreamTest {
     @Test
     public void testDataHandler_doQuery_okStatus() {
 
-        offsetReadJsonStream.dataHandler(dataHandler);
+        readJsonStream.dataHandler(dataHandler);
         messageBody
                 .putString("status", "ok")
                 .putNumber("number_found", 50)
@@ -94,7 +94,7 @@ public class OffsetReadJsonStreamTest {
     @Test
     public void testDataHandler_doQuery_badStatus() {
 
-        offsetReadJsonStream.dataHandler(dataHandler);
+        readJsonStream.dataHandler(dataHandler);
         messageBody.putString("status", "bad")
                 .putString("message", "defaultMessage");
 
@@ -110,8 +110,8 @@ public class OffsetReadJsonStreamTest {
     @Test
     public void testDataHandler_doQuery_nullExceptionHandler() {
 
-        offsetReadJsonStream.dataHandler(dataHandler);
-        offsetReadJsonStream.exceptionHandler(null);
+        readJsonStream.dataHandler(dataHandler);
+        readJsonStream.exceptionHandler(null);
 
         messageBody.putString("status", "bad")
                 .putString("message", "default unit test message")
@@ -135,7 +135,7 @@ public class OffsetReadJsonStreamTest {
     @Test
     public void testDataHandler_doQuery_nullDataHandler() {
 
-        offsetReadJsonStream.dataHandler(null);
+        readJsonStream.dataHandler(null);
 
         messageBody.putString("status", "ok")
                 .putString("message", "default unit test message")
@@ -157,8 +157,8 @@ public class OffsetReadJsonStreamTest {
     @Test
     public void testDataHandler_DoQuery_nullEndHandler() {
 
-        offsetReadJsonStream.dataHandler(dataHandler);
-        offsetReadJsonStream.endHandler(null);
+        readJsonStream.dataHandler(dataHandler);
+        readJsonStream.endHandler(null);
 
         messageBody.putString("status", "ok")
                 .putString("message", "default unit test message")
@@ -183,7 +183,7 @@ public class OffsetReadJsonStreamTest {
     public void testEndHandler_emptyDocs() {
 
         // this test should test for the last page of results
-        offsetReadJsonStream.dataHandler(dataHandler);
+        readJsonStream.dataHandler(dataHandler);
         messageBody
                 .putString("status", "ok")
                         // pretending we have more results than we do in order to trigger the 2nd loop of doQuery
@@ -235,7 +235,7 @@ public class OffsetReadJsonStreamTest {
     public void testEndHandler_noResults() {
 
         // this test should test for the last page of results
-        offsetReadJsonStream.dataHandler(dataHandler);
+        readJsonStream.dataHandler(dataHandler);
         // 0 results found, which should trigger the endHandler
         messageBody
                 .putString("status", "ok")
@@ -257,8 +257,8 @@ public class OffsetReadJsonStreamTest {
     public void testPause() {
 
         // first query will go through unless we pause it first
-        offsetReadJsonStream.pause();
-        offsetReadJsonStream.dataHandler(dataHandler);
+        readJsonStream.pause();
+        readJsonStream.dataHandler(dataHandler);
         // verify we sent no messages across the event bus
         verifyZeroInteractions(eventBus);
 
@@ -280,15 +280,15 @@ public class OffsetReadJsonStreamTest {
                                 .putString("status", "created")
                                 .putString("start_date", "1407337289472")));
 
-        offsetReadJsonStream.pause();
-        offsetReadJsonStream.dataHandler(dataHandler);
+        readJsonStream.pause();
+        readJsonStream.dataHandler(dataHandler);
         verifyZeroInteractions(eventBus);
         verifyZeroInteractions(endHandler);
         verifyZeroInteractions(dataHandler);
         verifyZeroInteractions(exceptionHandler);
 
         // on resume, it should go through another doQuery loop
-        offsetReadJsonStream.resume();
+        readJsonStream.resume();
         verify(eventBus).send(eq(address), eq(queryMessage), replyHandlerCaptor.capture());
         replyHandlerCaptor.getValue().handle(jsonMessage);
 
