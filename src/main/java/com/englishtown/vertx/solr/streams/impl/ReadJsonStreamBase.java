@@ -30,8 +30,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     private boolean queryRunning;
     private boolean paused;
 
-    protected ReadJsonStreamBase() {
-    }
+    protected ReadJsonStreamBase() {}
 
     /**
      * @param query SolrQuery object which holds the query data
@@ -134,7 +133,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
      * Set the query start point for pagination.  Typically either the start or cursorMark param.
      *
      * @param query SolrQuery object
-    */
+     */
 
     protected abstract void setQueryStart(SolrQuery query);
 
