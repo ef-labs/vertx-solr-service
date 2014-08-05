@@ -54,7 +54,7 @@ public class ReadJsonStreamTest {
         SolrQuery query = new SolrQuery()
                 .setQuery("start_date:*").setRows(25);
 
-        readJsonStream = new CursorMarkReadJsonStream(query, serializer, eventBus, address);
+        readJsonStream = new CursorMarkReadJsonStream();
         readJsonStream.exceptionHandler(exceptionHandler);
         readJsonStream.endHandler(endHandler);
 

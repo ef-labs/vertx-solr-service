@@ -1,10 +1,14 @@
 package com.englishtown.vertx.solr.integration;
 
+import com.englishtown.vertx.solr.SolrQuerySerializer;
+import com.englishtown.vertx.solr.impl.DefaultSolrQuerySerializer;
 import com.englishtown.vertx.solr.streams.impl.OffsetReadJsonStream;
 import com.englishtown.vertx.solr.streams.impl.SolrPump;
 import com.englishtown.vertx.solr.streams.impl.WriteJsonStreamBase;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
@@ -24,7 +28,15 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
     OffsetReadJsonStream offsetReadJsonStream;
     WriteJsonStreamBase writeJsonStreamBase;
 
+    EventBus eventBus;
+    SolrQuery query;
+    SolrQuerySerializer serializer;
+
     private void initJsonStreams(final Runnable onEnd, final Runnable onWrite) {
+
+        this.eventBus = vertx.eventBus();
+        this.query = new SolrQuery();
+        this.serializer = new DefaultSolrQuerySerializer();
 
         writeJsonStreamBase = new WriteJsonStreamBase() {
             @Override
@@ -68,7 +80,7 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
             }
         });
 
-        offsetReadJsonStream = new OffsetReadJsonStream(query, serializer, vertx.eventBus(), address)
+        offsetReadJsonStream = new OffsetReadJsonStream()
                 .endHandler(new Handler<Void>() {
                     @Override
                     public void handle(Void aVoid) {
@@ -81,15 +93,12 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                         handleThrowable(t);
                         fail();
                     }
-                });
+                }).eventBus(eventBus).serializer(serializer).solrQuery(query);
 
     }
 
     @Test
     public void testSolrPump_Start_Stop() {
-
-        System.out.println("1");
-        query.setQuery("name:*").setRows(5);
 
         initJsonStreams(new Runnable() {
                             @Override
@@ -105,8 +114,13 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                         },
                 null);
 
+        query.setQuery("name:*").setRows(5);
+
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         // start the pump, which initializes the dataHandler
+        solrPump.start();
+        // stop and start it again
+        solrPump.stop();
         solrPump.start();
 
     }

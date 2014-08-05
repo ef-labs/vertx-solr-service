@@ -1,10 +1,7 @@
 package com.englishtown.vertx.solr.streams.impl;
 
-import com.englishtown.vertx.solr.SolrQuerySerializer;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonObject;
 
 /**
@@ -16,15 +13,15 @@ public class CursorMarkReadJsonStream extends ReadJsonStreamBase<CursorMarkReadJ
     private String currCursorMark;
     private String nextCursorMark;
 
-    public CursorMarkReadJsonStream(SolrQuery query, SolrQuerySerializer serializer, EventBus eventBus, String address) {
-        super(query, serializer, eventBus, address);
+    public CursorMarkReadJsonStream() {
+        super();
         this.nextCursorMark = CursorMarkParams.CURSOR_MARK_START;
     }
 
     @Override
-    protected ModifiableSolrParams setQueryStart(SolrQuery query) {
+    protected void setQueryStart(SolrQuery query) {
 
-        return query.set(CursorMarkParams.CURSOR_MARK_PARAM, this.nextCursorMark);
+        query.set(CursorMarkParams.CURSOR_MARK_PARAM, this.nextCursorMark);
 
     }
 
@@ -36,6 +33,7 @@ public class CursorMarkReadJsonStream extends ReadJsonStreamBase<CursorMarkReadJ
 
         // Recall super
         super.handleReply(reply);
+
     }
 
     @Override
@@ -43,7 +41,7 @@ public class CursorMarkReadJsonStream extends ReadJsonStreamBase<CursorMarkReadJ
 
         boolean complete = false;
 
-        if (nextCursorMark == null || currCursorMark.equalsIgnoreCase(nextCursorMark)) {
+        if (nextCursorMark.equalsIgnoreCase(currCursorMark)) {
             complete = true;
         }
         return complete;

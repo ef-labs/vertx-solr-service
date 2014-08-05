@@ -4,7 +4,6 @@ import com.englishtown.vertx.solr.SolrQuerySerializer;
 import com.englishtown.vertx.solr.SolrVerticle;
 import com.englishtown.vertx.solr.streams.ReadJsonStream;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
@@ -19,10 +18,10 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
 
     private static final Logger logger = LoggerFactory.getLogger(ReadJsonStreamBase.class);
 
-    private final SolrQuery query;
-    private final SolrQuerySerializer serializer;
-    private final EventBus eventBus;
-    private final String address;
+    private SolrQuery query;
+    private SolrQuerySerializer serializer;
+    private EventBus eventBus;
+    private String address = SolrVerticle.DEFAULT_ADDRESS;
 
     private Handler<Void> endHandler;
     private Handler<JsonObject> dataHandler;
@@ -31,13 +30,53 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     private boolean queryRunning;
     private boolean paused;
 
-    protected ReadJsonStreamBase(SolrQuery query, SolrQuerySerializer serializer, EventBus eventBus, String address) {
-        this.query = query;
-        this.serializer = serializer;
-        this.eventBus = eventBus;
-        this.address = address;
+    protected ReadJsonStreamBase() {
     }
 
+    /**
+     * @param query SolrQuery object which holds the query data
+     * @return Returns this
+     */
+    @SuppressWarnings("unchecked")
+    public T solrQuery(SolrQuery query) {
+        this.query = query;
+        return (T) this;
+    }
+
+    /**
+     * @param serializer SolrQuerySerializer which helps to serialize/deserialize SolrQuery objects
+     * @return Returns this
+     */
+    @SuppressWarnings("unchecked")
+    public T serializer(SolrQuerySerializer serializer) {
+        this.serializer = serializer;
+        return (T) this;
+    }
+
+    /**
+     * @param eventBus Vert.x eventBus
+     * @return Returns this
+     */
+    @SuppressWarnings("unchecked")
+    public T eventBus(EventBus eventBus) {
+        this.eventBus = eventBus;
+        return (T) this;
+    }
+
+    /**
+     * @param address address the read and write streams will communicate with on over the Vert.x eventBus
+     * @return Returns this
+     */
+    @SuppressWarnings("unchecked")
+    public T address(String address) {
+        this.address = address;
+        return (T) this;
+    }
+
+    /**
+     * @param endHandler Handler called when the pump has finished
+     * @return Returns this
+     */
     @SuppressWarnings("unchecked")
     @Override
     public T endHandler(Handler<Void> endHandler) {
@@ -95,9 +134,9 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
      * Set the query start point for pagination.  Typically either the start or cursorMark param.
      *
      * @param query SolrQuery object
-     * @return
-     */
-    protected abstract ModifiableSolrParams setQueryStart(SolrQuery query);
+    */
+
+    protected abstract void setQueryStart(SolrQuery query);
 
     private void doQuery() {
 

@@ -1,9 +1,6 @@
 package com.englishtown.vertx.solr.streams.impl;
 
-import com.englishtown.vertx.solr.SolrQuerySerializer;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.params.ModifiableSolrParams;
-import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonObject;
 
 /**
@@ -14,15 +11,16 @@ public class OffsetReadJsonStream extends ReadJsonStreamBase<OffsetReadJsonStrea
 
     private int nextOffset;
 
-    public OffsetReadJsonStream(SolrQuery query, SolrQuerySerializer serializer, EventBus eventBus, String address) {
-        super(query, serializer, eventBus, address);
+    public OffsetReadJsonStream() {
+        super();
     }
+
 
     // this method needs to be aware of pausing so that it can keep track of where it is when it resumes
     @Override
-    protected ModifiableSolrParams setQueryStart(SolrQuery query) {
+    protected void setQueryStart(SolrQuery query) {
 
-        return query.setStart(nextOffset);
+        query.setStart(nextOffset);
 
     }
 
@@ -30,7 +28,6 @@ public class OffsetReadJsonStream extends ReadJsonStreamBase<OffsetReadJsonStrea
     protected void handleReply(JsonObject reply) {
 
         int count = reply.getArray("docs").size();
-        // nextOffset gets incremented once a resume has been called.
         nextOffset += count;
 
         // Recall super
