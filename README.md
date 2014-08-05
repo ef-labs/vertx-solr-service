@@ -79,6 +79,7 @@ Send a json message to Solr across the event bus with the following structure:
     }
 }
 ```
+
 * `action` - The action to perform.
 * `q` - The Solr query.
 * `rows` - The number of rows to return per query.
@@ -114,11 +115,11 @@ The event bus replies with a json message with the following structure:
     "status": <status>
 }
 ```
-*`max_score` - The maximum score for the search.
-*`number_found` - The total number of results found.
-*`start` - The starting point of this query. This number will increment based on the rows parameter passed in.
-*`docs` - The docs array, which holds the query results.
-*`status` - The status of the Solr core. If the status is not "ok" something has gone wrong.
+* `max_score` - The maximum score for the search.
+* `number_found` - The total number of results found.
+* `start` - The starting point of this query. This number will increment based on the rows parameter passed in.
+* `docs` - The docs array, which holds the query results.
+* `status` - The status of the Solr event bus message. If the status is not "ok" something has gone wrong.
 
 An example reply message would be:
 
