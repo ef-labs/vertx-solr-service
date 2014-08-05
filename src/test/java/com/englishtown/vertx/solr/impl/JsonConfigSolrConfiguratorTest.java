@@ -49,7 +49,7 @@ public class JsonConfigSolrConfiguratorTest {
     public void testCreateSolrServer_HttpSolrServer_Fail() throws Exception {
 
         try {
-            SolrServer server = configurator.createSolrServer();
+            configurator.createSolrServer();
             fail();
         } catch (IllegalArgumentException e) {
             // expected
