@@ -144,6 +144,9 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
 
     private void doQuery() {
 
+        if (eventBus == null || serializer == null || query == null) {
+            handleException(new RuntimeException("Please ensure you have set the eventBus, serializer and query objects"));
+        }
         // Don't send a second query if already running
         if (queryRunning) {
             return;
