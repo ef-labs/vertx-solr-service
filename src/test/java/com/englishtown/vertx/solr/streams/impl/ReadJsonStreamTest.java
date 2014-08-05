@@ -54,7 +54,7 @@ public class ReadJsonStreamTest {
         SolrQuery query = new SolrQuery()
                 .setQuery("start_date:*").setRows(25);
 
-        readJsonStream = new CursorMarkReadJsonStream();
+        readJsonStream = new CursorMarkReadJsonStream().serializer(serializer).solrQuery(query).eventBus(eventBus);
         readJsonStream.exceptionHandler(exceptionHandler);
         readJsonStream.endHandler(endHandler);
 
@@ -116,6 +116,7 @@ public class ReadJsonStreamTest {
         messageBody.putString("status", "bad")
                 .putString("message", "default unit test message")
                 .putNumber("number_found", 3)
+                .putString("next_cursor_mark", "test_cursor2")
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
                                 .putString("test_session_id", "9023udj2-1312-1ld1-lvd3-989fu1dmnsfm")
@@ -140,15 +141,13 @@ public class ReadJsonStreamTest {
         messageBody.putString("status", "ok")
                 .putString("message", "default unit test message")
                 .putNumber("number_found", 3)
+                .putString("next_cursor_mark", "test_cursor2")
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
                                 .putString("test_session_id", "9023udj2-1312-1ld1-lvd3-989fu1dmnsfm")
                                 .putString("status", "created")
                                 .putString("start_date", "1407337289472")));
 
-        // should be no calls to the event bus if we don't have a dataHandler
-        verifyZeroInteractions(eventBus);
-        verify(exceptionHandler).handle(any(Throwable.class));
         verifyZeroInteractions(dataHandler);
         verifyZeroInteractions(endHandler);
 
@@ -163,6 +162,7 @@ public class ReadJsonStreamTest {
         messageBody.putString("status", "ok")
                 .putString("message", "default unit test message")
                 .putNumber("number_found", 3)
+                .putString("next_cursor_mark", "test_cursor")
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
                                 .putString("test_session_id", "9023udj2-1312-1ld1-lvd3-989fu1dmnsfm")
@@ -240,6 +240,7 @@ public class ReadJsonStreamTest {
         messageBody
                 .putString("status", "ok")
                 .putNumber("number_found", 0)
+                .putString("next_cursor_mark", "*")
                 .putArray("docs", new JsonArray());
 
         // test with one result set that returns results
@@ -274,6 +275,7 @@ public class ReadJsonStreamTest {
         messageBody.putString("status", "ok")
                 .putString("message", "default unit test message")
                 .putNumber("number_found", 3)
+                .putString("next_cursor_mark", "test_cursor2")
                 .putArray("docs", new JsonArray()
                         .addObject(new JsonObject()
                                 .putString("test_session_id", "9023udj2-1312-1ld1-lvd3-989fu1dmnsfm")

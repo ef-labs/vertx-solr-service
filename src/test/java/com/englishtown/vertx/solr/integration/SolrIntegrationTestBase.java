@@ -13,11 +13,9 @@ import org.vertx.testtools.TestVerticle;
 /**
  * Solr base integration test
  */
-public class SolrIntegrationTestBase extends TestVerticle {
+public abstract class SolrIntegrationTestBase extends TestVerticle {
 
     protected SolrQuerySerializer serializer = new DefaultSolrQuerySerializer();
-    protected String address = SolrVerticle.DEFAULT_ADDRESS;
-    protected SolrQuery query = new SolrQuery();
 
     /**
      * {@inheritDoc}
