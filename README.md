@@ -10,17 +10,35 @@ The configuration options are as follows:
 }
 ```
 
-* `hk2_binder` - The fully qualified path name of your hk2_binder. For more documentation on 
-* `server_type` - The type of Solr server.
+* `hk2_binder` - The fully qualified path name of your hk2_binder. 
+* `server_type` - The type of Solr server, either LBHttpSolrServer or HttpSolrServer.
 * `server_url` - The url to your Solr installation.
+* `server_urls` -  The urls for your Solr installations. If using this parameter, your urls should be a JsonArray list of LBHttpSolrServer server urls.
 
-An an example configuration would be:
+An an example HttpSolrServer configuration would be:
 
 ```
 {
     "hk2_binder": "com.englishtown.vertx.solr.hk2.SolrBinder",
     "server_type": "HttpSolrServer",
     "server_url": "http://localhost:8983/solr"
+}
+```
+
+An an example LBHttpSolrServer configuration would be:
+
+```
+{
+    "hk2_binder": "com.englishtown.vertx.solr.hk2.SolrBinder",
+    "server_type": "LBHttpSolrServer",
+    "server_urls": [
+        {
+            "server_url": "http://localhost:8983/solr1"
+        },
+        {
+            "server_url": "http://localhost:8983/solr2"
+        }
+    ]
 }
 ```
 
@@ -39,7 +57,9 @@ See the [englishtown/vertx-mod-hk2](https://github.com/englishtown/vertx-mod-hk2
 
 ## Action Commands
 
-### Search
+### Query
+
+Standard Solr query parameters are supported. In the below example, the "q", "start" and "rows" parameters are used. See the [Solr CommonQueryParameters Wiki](http://wiki.apache.org/solr/CommonQueryParameters) for query construction details. 
 
 Send a json message to Solr across the event bus with the following structure:
 
@@ -59,6 +79,10 @@ Send a json message to Solr across the event bus with the following structure:
     }
 }
 ```
+* `action` - The action to perform.
+* `q` - The Solr query.
+* `rows` - The number of rows to return per query.
+* `start` - The starting point of the query.
 
 An example message would be:
 
@@ -90,6 +114,11 @@ The event bus replies with a json message with the following structure:
     "status": <status>
 }
 ```
+*`max_score` - The maximum score for the search.
+*`number_found` - The total number of results found.
+*`start` - The starting point of this query. This number will increment based on the rows parameter passed in.
+*`docs` - The docs array, which holds the query results.
+*`status` - The status of the Solr core. If the status is not "ok" something has gone wrong.
 
 An example reply message would be:
 
