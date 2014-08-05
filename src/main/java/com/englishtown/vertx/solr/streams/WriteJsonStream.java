@@ -19,7 +19,7 @@ public interface WriteJsonStream<T> extends ExceptionSupport<T>, DrainSupport<T>
      * {@link com.englishtown.vertx.solr.streams.impl.SolrPump}.
      *
      * @param jsonObject JsonObject we write to
-     * @return
+     * @return Returns this
      */
     T write(JsonObject jsonObject);
 }

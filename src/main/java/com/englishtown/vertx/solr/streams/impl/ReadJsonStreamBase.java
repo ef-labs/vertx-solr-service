@@ -51,7 +51,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
      * and starts the Solr query and begins running through the pagination loops
      *
      * @param handler Handler responsible for writing data to the stream
-     * @return
+     * @return Returns this
      */
     @SuppressWarnings("unchecked")
     @Override
