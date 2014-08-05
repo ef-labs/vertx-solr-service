@@ -48,7 +48,7 @@ public class SolrIntegrationTest extends SolrIntegrationTestBase {
                 assertNotNull(docs);
 
                 assertEquals(0, start.intValue());
-                assertTrue(numberFound.intValue() > 0);
+                assertTrue(numberFound > 0);
                 assertTrue(docs.size() > 0);
 
                 testComplete();

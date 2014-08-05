@@ -14,7 +14,7 @@ import java.util.List;
 import static org.vertx.testtools.VertxAssert.*;
 
 /**
- * Created by yongkim on 8/4/14.
+ * Integration test for the SolrPump
  */
 public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
 
@@ -30,7 +30,9 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
             @Override
             public WriteJsonStreamBase write(JsonObject jsonObject) {
                 results.add(jsonObject);
-                if (onWrite != null) onWrite.run();
+                if (onWrite != null) {
+                    onWrite.run();
+                }
                 return this;
             }
 
@@ -59,6 +61,8 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
         }.exceptionHandler(new Handler<Throwable>() {
             @Override
             public void handle(Throwable t) {
+                // it won't come in here unless it actually needs to throw an exception, but it does set the exception handler in case
+                // it does need to through an exception.
                 handleThrowable(t);
                 fail();
             }
@@ -84,20 +88,22 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
     @Test
     public void testSolrPump_Start_Stop() {
 
+        System.out.println("1");
         query.setQuery("name:*").setRows(5);
 
         initJsonStreams(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < results.size(); i++) {
-                    // check each result for a docs array and ensure number_found is greater than 0
-                    JsonArray docs = results.get(i).getArray("docs");
-                    assertNotNull(docs);
-                    Integer numberFound = results.get(i).getNumber("number_found").intValue();
-                    assertTrue(numberFound > 0);
-                }
-            }
-        }, null);
+                            @Override
+                            public void run() {
+                                for (JsonObject result : results) {
+                                    // check each result for a docs array and ensure number_found is greater than 0
+                                    JsonArray docs = result.getArray("docs");
+                                    assertNotNull(docs);
+                                    Integer numberFound = result.getNumber("number_found").intValue();
+                                    assertTrue(numberFound > 0);
+                                }
+                            }
+                        },
+                null);
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         // start the pump, which initializes the dataHandler
@@ -111,11 +117,11 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
         initJsonStreams(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < results.size(); i++) {
+                for (JsonObject result : results) {
                     // check each result for a docs array and ensure number_found is greater than 0
-                    JsonArray docs = results.get(i).getArray("docs");
+                    JsonArray docs = result.getArray("docs");
                     assertNotNull(docs);
-                    Integer numberFound = results.get(i).getNumber("number_found").intValue();
+                    Integer numberFound = result.getNumber("number_found").intValue();
                     assertTrue(numberFound > 0);
                 }
             }
@@ -135,6 +141,7 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         solrPump.start();
+        // try multiple pauses/resumes
         offsetReadJsonStream.pause();
         offsetReadJsonStream.resume();
         offsetReadJsonStream.pause();

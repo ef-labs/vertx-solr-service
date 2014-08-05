@@ -50,7 +50,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
      * It takes a dataHandler, which is passed in from the Pump, sets this class's dataHandler equal to the one passed in
      * and starts the Solr query and begins running through the pagination loops
      *
-     * @param handler
+     * @param handler Handler responsible for writing data to the stream
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -94,14 +94,11 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     /**
      * Set the query start point for pagination.  Typically either the start or cursorMark param.
      *
-     * @param query the SolrQuery object
+     * @param query SolrQuery object
      * @return
      */
     protected abstract ModifiableSolrParams setQueryStart(SolrQuery query);
 
-    // doQuery never knows if something is paused, because it will never come in here if it is paused, yet the counter
-    // will keep incrementing inside the override of handleReply. we need to make handleReply aware of the value of pause
-    // or move the pause check somewhere else.
     private void doQuery() {
 
         // Don't send a second query if already running
@@ -113,8 +110,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
 
         setQueryStart(query);
 
-        // send Solr a "query" json object with the query and attributes to signify this is a Solr query, which basically says:
-        // "Here is the action. It is a query. Also, here is the query"
+        // send Solr a "query" json object with the query and attributes to signify this is a Solr query.
         JsonObject message = new JsonObject()
                 .putString(SolrVerticle.FIELD_ACTION, SolrVerticle.FIELD_QUERY)
                 .putObject(SolrVerticle.FIELD_QUERY, serializer.serialize(query));
@@ -156,7 +152,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     /**
      * Pagination looping logic - continuously runs through a doQuery loop until all results have been streamed
      *
-     * @param reply the JsonObject query reply from Solr
+     * @param reply JsonObject query reply from Solr
      */
     protected void handleReply(JsonObject reply) {
 
