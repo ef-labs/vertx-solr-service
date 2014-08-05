@@ -33,6 +33,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     protected ReadJsonStreamBase() {}
 
     /**
+     * This is a required parameter.
      * @param query SolrQuery object which holds the query data
      * @return Returns this
      */
@@ -43,6 +44,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     }
 
     /**
+     * This is a required parameter.
      * @param serializer SolrQuerySerializer which helps to serialize/deserialize SolrQuery objects
      * @return Returns this
      */
@@ -53,6 +55,7 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     }
 
     /**
+     * This is a required parameter.
      * @param eventBus Vert.x eventBus
      * @return Returns this
      */
@@ -63,7 +66,9 @@ public abstract class ReadJsonStreamBase<T extends ReadJsonStreamBase<T>> implem
     }
 
     /**
-     * @param address address the read and write streams will communicate with on over the Vert.x eventBus
+     * This is a optional parameter.
+     * @param address address the read and write streams will communicate with on over the Vert.x eventBus.
+     * This will default to "et.solr.address" if not explicitly set.
      * @return Returns this
      */
     @SuppressWarnings("unchecked")
