@@ -18,8 +18,8 @@ public interface WriteJsonStream<T> extends ExceptionSupport<T>, DrainSupport<T>
      * check the {@link #writeQueueFull} method before writing. This is done automatically if using a
      * {@link com.englishtown.vertx.solr.streams.impl.SolrPump}.
      *
-     * @param jsonObject Json object in which to write
-     * @return 
+     * @param jsonObject JsonObject we write to
+     * @return
      */
     T write(JsonObject jsonObject);
 }

@@ -14,6 +14,9 @@ public interface ReadJsonStream<T> extends ReadSupport<T, JsonObject> {
 
     /**
      * Set an end handler. Once the stream has ended, and there is no more data to be read, this handler will be called.
+     *
+     * @param endHandler Handler called when the pump has finished
+     * @return
      */
     T endHandler(Handler<Void> endHandler);
 

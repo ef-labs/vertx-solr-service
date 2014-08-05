@@ -47,7 +47,9 @@ public class SolrPump {
      *
      * @param rs ReadStream
      * @param ws WriteStream
-     * @param writeQueueMaxSize maximum allowed size of the write queue
+     * @param writeQueueMaxSize Maximum allowed size of the write queue
+     * @return
+     *
      */
     public static SolrPump createPump(ReadJsonStream<?> rs, WriteJsonStream<?> ws, int writeQueueMaxSize) {
         return new SolrPump(rs, ws, writeQueueMaxSize);
@@ -56,7 +58,9 @@ public class SolrPump {
     /**
      * Set the write queue max size to {@code writeQueueMaxSize}
      *
-     * @param maxSize maximum size to set for the write queue
+     * @param maxSize Maximum size to set for the write queue
+     *
+     * @return
      */
     public SolrPump setWriteQueueMaxSize(int maxSize) {
         this.writeJsonStream.setWriteQueueMaxSize(maxSize);
@@ -65,6 +69,8 @@ public class SolrPump {
 
     /**
      * Start the Pump. The Pump can be started and stopped multiple times.
+     *
+     * @return
      */
     public SolrPump start() {
         readJsonStream.dataHandler(dataHandler);
@@ -73,6 +79,8 @@ public class SolrPump {
 
     /**
      * Stop the SolrDataPump. The SolrDataPump can be started and stopped multiple times.
+     *
+     * @return
      */
     public SolrPump stop() {
         writeJsonStream.drainHandler(null);
@@ -83,6 +91,7 @@ public class SolrPump {
     /**
      * Return the total number of Json objects pumped by this pump.
      *
+     * @return
      */
     public int objectsPumped() {
         return pumped;
