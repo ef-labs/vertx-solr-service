@@ -3,7 +3,6 @@ package com.englishtown.vertx.solr.integration;
 import com.englishtown.vertx.solr.SolrQuerySerializer;
 import com.englishtown.vertx.solr.SolrVerticle;
 import com.englishtown.vertx.solr.impl.DefaultSolrQuerySerializer;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
