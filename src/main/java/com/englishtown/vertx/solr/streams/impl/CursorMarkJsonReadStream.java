@@ -1,38 +1,38 @@
 package com.englishtown.vertx.solr.streams.impl;
 
+import com.englishtown.vertx.solr.SolrService;
+import io.vertx.core.json.JsonObject;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.vertx.java.core.json.JsonObject;
 
 /**
- * CursorMark implementation of {@link com.englishtown.vertx.solr.streams.impl.ReadJsonStreamBase}
+ * CursorMark implementation of {@link JsonReadStreamBase}
  * using {@code CursorMark} to paginate json Solr results
  */
-public class CursorMarkReadJsonStream extends ReadJsonStreamBase<CursorMarkReadJsonStream> {
+public class CursorMarkJsonReadStream extends JsonReadStreamBase {
 
     private String currCursorMark;
     private String nextCursorMark;
 
-    public CursorMarkReadJsonStream() {
-        super();
+    public CursorMarkJsonReadStream(SolrService solrService) {
+        super(solrService);
         this.nextCursorMark = CursorMarkParams.CURSOR_MARK_START;
     }
 
     @Override
-    protected void setQueryStart(SolrQuery query) {
-
+    protected CursorMarkJsonReadStream setQueryStart(SolrQuery query) {
         query.set(CursorMarkParams.CURSOR_MARK_PARAM, this.nextCursorMark);
-
+        return this;
     }
 
     @Override
-    protected void handleReply(JsonObject reply) {
+    protected void handleResults(JsonObject reply) {
 
-        this.currCursorMark= this.nextCursorMark;
+        this.currCursorMark = this.nextCursorMark;
         this.nextCursorMark = reply.getString("next_cursor_mark");
 
         // Recall super
-        super.handleReply(reply);
+        super.handleResults(reply);
 
     }
 
