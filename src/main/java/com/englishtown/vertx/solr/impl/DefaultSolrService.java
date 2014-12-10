@@ -1,5 +1,6 @@
 package com.englishtown.vertx.solr.impl;
 
+import com.englishtown.vertx.solr.QueryBuilder;
 import com.englishtown.vertx.solr.SolrConfigurator;
 import com.englishtown.vertx.solr.SolrService;
 import com.englishtown.vertx.solr.VertxSolrQuery;
@@ -41,6 +42,10 @@ public class DefaultSolrService implements SolrService {
             solrServer.shutdown();
             solrServer = null;
         }
+    }
+
+    public QueryBuilder getQueryBuilder() {
+        return new DefaultQueryBuilder();
     }
 
     @Override
