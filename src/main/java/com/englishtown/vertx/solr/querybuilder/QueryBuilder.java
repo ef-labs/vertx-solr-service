@@ -1,4 +1,6 @@
-package com.englishtown.vertx.solr;
+package com.englishtown.vertx.solr.querybuilder;
+
+import com.englishtown.vertx.solr.VertxSolrQuery;
 
 /**
  */

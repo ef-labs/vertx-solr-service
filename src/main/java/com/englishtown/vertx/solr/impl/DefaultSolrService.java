@@ -1,9 +1,10 @@
 package com.englishtown.vertx.solr.impl;
 
-import com.englishtown.vertx.solr.QueryBuilder;
+import com.englishtown.vertx.solr.querybuilder.QueryBuilder;
 import com.englishtown.vertx.solr.SolrConfigurator;
 import com.englishtown.vertx.solr.SolrService;
 import com.englishtown.vertx.solr.VertxSolrQuery;
+import com.englishtown.vertx.solr.querybuilder.impl.DefaultQueryBuilder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;

@@ -1,8 +1,8 @@
-package com.englishtown.vertx.solr.impl;
+package com.englishtown.vertx.solr.querybuilder.impl;
 
-import com.englishtown.vertx.solr.Query;
-import com.englishtown.vertx.solr.QueryBuilder;
-import com.englishtown.vertx.solr.Term;
+import com.englishtown.vertx.solr.querybuilder.Query;
+import com.englishtown.vertx.solr.querybuilder.QueryBuilder;
+import com.englishtown.vertx.solr.querybuilder.Term;
 import com.englishtown.vertx.solr.VertxSolrQuery;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class DefaultQueryBuilder implements QueryBuilder {
     private Query query;
     private int numRows;
 
-    DefaultQueryBuilder() {
+    public DefaultQueryBuilder() {
         filterQueryTerms = new ArrayList<>();
 
         showDebugInfo = false;

@@ -1,4 +1,4 @@
-package com.englishtown.vertx.solr;
+package com.englishtown.vertx.solr.querybuilder;
 
 /**
  */
