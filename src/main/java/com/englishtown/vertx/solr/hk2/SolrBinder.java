@@ -4,6 +4,8 @@ import com.englishtown.vertx.solr.SolrConfigurator;
 import com.englishtown.vertx.solr.SolrService;
 import com.englishtown.vertx.solr.impl.DefaultSolrService;
 import com.englishtown.vertx.solr.impl.JsonConfigSolrConfigurator;
+import com.englishtown.vertx.solr.querybuilder.QueryBuilder;
+import com.englishtown.vertx.solr.querybuilder.impl.DefaultQueryBuilder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import javax.inject.Singleton;
@@ -21,6 +23,7 @@ public class SolrBinder extends AbstractBinder {
 
         bind(JsonConfigSolrConfigurator.class).to(SolrConfigurator.class).in(Singleton.class);
         bind(DefaultSolrService.class).to(SolrService.class).in(Singleton.class);
+        bind(DefaultQueryBuilder.class).to(QueryBuilder.class);
 
     }
 }

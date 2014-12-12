@@ -45,10 +45,6 @@ public class DefaultSolrService implements SolrService {
         }
     }
 
-    public QueryBuilder getQueryBuilder() {
-        return new DefaultQueryBuilder();
-    }
-
     @Override
     public void query(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
         query(new VertxSolrQuery(query), resultHandler);
