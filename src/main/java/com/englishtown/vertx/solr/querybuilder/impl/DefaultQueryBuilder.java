@@ -18,8 +18,8 @@ public class DefaultQueryBuilder implements QueryBuilder {
     private boolean showDebugInfo;
     private String queryPrefix;
 
-    private static final String DESCENDING_DATE_BOOST = "{!boost b=product(recip(ms(NOW,$FIELDNAME),3.16e-11,1,1), $MULTIPLIER)}";
-    private static final String ASCENDING_DATE_BOOST = "{!boost b=product(sub(1,recip(ms(NOW,$FIELDNAME),3.16e-11,1,1)), $MULTIPLIER)}";
+    private static final String DESCENDING_DATE_BOOST = "{!boost b=product(recip(ms(NOW,$FIELDNAME),3.16e-11,1,1),$MULTIPLIER)}";
+    private static final String ASCENDING_DATE_BOOST = "{!boost b=product(sub(1,recip(ms(NOW,$FIELDNAME),3.16e-11,1,1)),$MULTIPLIER)}";
     private Query query;
     private int numRows;
 

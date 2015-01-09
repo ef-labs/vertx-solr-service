@@ -109,7 +109,7 @@ public class DefaultQueryBuilderTest {
         dqb.dateBoost("datecolumn", QueryBuilder.DateOrder.ASCENDING);
 
         // Then our SolrQuery should have the right query string
-        assertEquals("{!boost b=product(sub(1,recip(ms(NOW,datecolumn),3.16e-11,1,1)), 1)}*:*", dqb.build().getQuery());
+        assertEquals("{!boost b=product(sub(1,recip(ms(NOW,datecolumn),3.16e-11,1,1)),1)}*:*", dqb.build().getQuery());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class DefaultQueryBuilderTest {
         dqb.dateBoost("datecolumn", QueryBuilder.DateOrder.DESCENDING, 25);
 
         // Then our SolrQuery should have the right query string
-        assertEquals("{!boost b=product(recip(ms(NOW,datecolumn),3.16e-11,1,1), 25)}*:*", dqb.build().getQuery());
+        assertEquals("{!boost b=product(recip(ms(NOW,datecolumn),3.16e-11,1,1),25)}*:*", dqb.build().getQuery());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class DefaultQueryBuilderTest {
         VertxSolrQuery solrQuery = dqb.build();
 
         String q = solrQuery.getQuery();
-        assertEquals("{!boost b=product(sub(1,recip(ms(NOW,created),3.16e-11,1,1)), 1)}(lang_level:[6 TO 8]^100 OR lang_level:[4 TO 5]^150 OR lang_level:9^10) AND (utc_offset:\"-9\"^50 OR utc_offset:\"-10\"^20 OR utc_offset:\"-11\"^20)", q);
+        assertEquals("{!boost b=product(sub(1,recip(ms(NOW,created),3.16e-11,1,1)),1)}(lang_level:[6 TO 8]^100 OR lang_level:[4 TO 5]^150 OR lang_level:9^10) AND (utc_offset:\"-9\"^50 OR utc_offset:\"-10\"^20 OR utc_offset:\"-11\"^20)", q);
 
         String[] fq = solrQuery.getFilterQueries();
         assertArrayEquals(new String[]{"lang_code:en", "gender:f"}, fq);
