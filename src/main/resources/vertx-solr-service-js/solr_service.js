@@ -19,6 +19,7 @@ var utils = require('vertx-js/util/utils');
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
 var JSolrService = com.englishtown.vertx.solr.SolrService;
+var QueryOptions = com.englishtown.vertx.solr.QueryOptions;
 
 /**
  Vert.x solr service
@@ -44,10 +45,10 @@ var SolrService = function(j_val) {
     } else utils.invalidArgs();
   };
 
-  this.query = function(query, resultHandler) {
+  this.query = function(query, options, resultHandler) {
     var __args = arguments;
-    if (__args.length === 2 && typeof __args[0] === 'object' && typeof __args[1] === 'function') {
-      j_solrService.query(utils.convParamJsonObject(query), function(ar) {
+    if (__args.length === 3 && typeof __args[0] === 'object' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+      j_solrService.query(utils.convParamJsonObject(query), options != null ? new QueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnJson(ar.result()), null);
       } else {

@@ -7,11 +7,13 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.util.NamedList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +29,8 @@ import static org.mockito.Mockito.*;
 public class DefaultSolrServiceTest {
 
     DefaultSolrService service;
+    NamedList<Object> namedList;
+    SolrDocumentList results;
 
     @Mock
     Vertx vertx;
@@ -44,7 +48,12 @@ public class DefaultSolrServiceTest {
     @Before
     public void setUp() throws Exception {
 
+        results = new SolrDocumentList();
+        namedList = new NamedList<>();
+        namedList.add("response", results);
+
         when(configurator.createSolrServer()).thenReturn(solrServer);
+        when(solrServer.request(any(SolrRequest.class))).thenReturn(namedList);
 
         service = new DefaultSolrService(configurator);
         service.start();
@@ -74,7 +83,6 @@ public class DefaultSolrServiceTest {
         verify(asyncResultHandler).handle(any());
     }
 
-
     @Test
     public void testQuery() throws Exception {
         VertxSolrQuery options = new VertxSolrQuery();
@@ -87,7 +95,6 @@ public class DefaultSolrServiceTest {
         when(solrServer.query(any())).thenReturn(queryResponse);
         when(queryResponse.getResults()).thenReturn(results);
         service.query(options, asyncResultHandler);
-        verify(solrServer).query(options);
         verify(asyncResultHandler).handle(futureCaptor.capture());
         assertTrue(futureCaptor.getValue().succeeded());
     }

@@ -33,6 +33,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import com.englishtown.vertx.solr.QueryOptions;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -67,7 +68,7 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
         break;
       }
       case "query": {
-        service.query((io.vertx.core.json.JsonObject)json.getValue("query"), createHandler(msg));
+        service.query((io.vertx.core.json.JsonObject)json.getValue("query"), new com.englishtown.vertx.solr.QueryOptions(json.getJsonObject("options")), createHandler(msg));
         break;
       }
       default: {

@@ -1,5 +1,6 @@
 package com.englishtown.vertx.solr.streams.impl;
 
+import com.englishtown.vertx.solr.QueryOptions;
 import com.englishtown.vertx.solr.SolrService;
 import com.englishtown.vertx.solr.VertxSolrQuery;
 import io.vertx.core.AsyncResult;
@@ -69,7 +70,7 @@ public class OffsetReadJsonStreamTest {
                                 .put("test_session_id", "9023udj2-1312-1ld1-lvd3-989fu1dmnsfm")
                                 .put("status", "created")
                                 .put("start_date", "1407337289472")));
-        verify(solrService).query(any(VertxSolrQuery.class), resultHandlerCaptor.capture());
+        verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         verifyZeroInteractions(exceptionHandler);
         // endHandler should only be called if there are no more results to paginate through
         verifyZeroInteractions(endHandler);
@@ -84,7 +85,7 @@ public class OffsetReadJsonStreamTest {
 
         messageBody.put("message", "defaultMessage");
 
-        verify(solrService).query(any(VertxSolrQuery.class), resultHandlerCaptor.capture());
+        verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
 
         verify(exceptionHandler).handle(any(Throwable.class));
@@ -102,7 +103,7 @@ public class OffsetReadJsonStreamTest {
 
         messageBody.put("message", "defaultMessage");
 
-        verify(solrService).query(any(VertxSolrQuery.class), resultHandlerCaptor.capture());
+        verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
 
         // with no exceptionHandler, the exception cannot be handled, but it will be logged
@@ -149,7 +150,7 @@ public class OffsetReadJsonStreamTest {
                                 .put("status", "created")
                                 .put("start_date", "1407337289472")));
 
-        verify(solrService).query(any(VertxSolrQuery.class), resultHandlerCaptor.capture());
+        verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
 
         // we are not throwing any exceptions if the endHandler is null - passing in an endHandler is optional
@@ -180,7 +181,7 @@ public class OffsetReadJsonStreamTest {
                                 .put("start_date", "1407337289472")));
 
         // test with one result set that returns results
-        verify(solrService).query(any(VertxSolrQuery.class), resultHandlerCaptor.capture());
+        verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
         verify(dataHandler).handle(messageBody);
         verifyZeroInteractions(exceptionHandler);
@@ -222,7 +223,7 @@ public class OffsetReadJsonStreamTest {
                 .put("docs", new JsonArray());
 
         // test with one result set that returns results
-        verify(solrService).query(any(VertxSolrQuery.class), resultHandlerCaptor.capture());
+        verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
         // should still handle writing a response with nothing found
         verify(dataHandler).handle(messageBody);
@@ -265,7 +266,7 @@ public class OffsetReadJsonStreamTest {
 
         // on resume, it should go through another doQuery loop
         readJsonStream.resume();
-        verify(solrService).query(any(VertxSolrQuery.class), resultHandlerCaptor.capture());
+        verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
 
         verifyZeroInteractions(exceptionHandler);

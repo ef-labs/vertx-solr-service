@@ -1,5 +1,6 @@
 package com.englishtown.vertx.solr.streams.impl;
 
+import com.englishtown.vertx.solr.QueryOptions;
 import com.englishtown.vertx.solr.SolrService;
 import com.englishtown.vertx.solr.VertxSolrQuery;
 import io.vertx.core.Handler;
@@ -20,6 +21,7 @@ public abstract class JsonReadStreamBase implements ReadStream<JsonObject> {
     private final SolrService solrService;
 
     private VertxSolrQuery query;
+    private QueryOptions options;
 
     private Handler<Void> endHandler;
     private Handler<JsonObject> dataHandler;
@@ -42,6 +44,17 @@ public abstract class JsonReadStreamBase implements ReadStream<JsonObject> {
      */
     public JsonReadStreamBase solrQuery(VertxSolrQuery query) {
         this.query = query;
+        return this;
+    }
+
+    /**
+     * Optional param
+     *
+     * @param options Optional query options
+     * @return Returns this
+     */
+    public JsonReadStreamBase queryOptions(QueryOptions options) {
+        this.options = options;
         return this;
     }
 
@@ -120,7 +133,7 @@ public abstract class JsonReadStreamBase implements ReadStream<JsonObject> {
         setQueryStart(query);
 
         // send this json message over the event bus with a reply handler.
-        solrService.query(query, result -> {
+        solrService.query(query, options, result -> {
             try {
                 if (result.succeeded()) {
                     handleResults(result.result());

@@ -28,6 +28,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
+import com.englishtown.vertx.solr.QueryOptions;
 
 /*
   Generated Proxy code - DO NOT EDIT
@@ -50,10 +51,11 @@ public class SolrServiceVertxEBProxy implements SolrService {
   public void stop() {
   }
 
-  public void query(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
+  public void query(JsonObject query, QueryOptions options, Handler<AsyncResult<JsonObject>> resultHandler) {
     checkClosed();
     JsonObject _json = new JsonObject();
     _json.put("query", query);
+    _json.put("options", options.toJson());
     DeliveryOptions _deliveryOptions = new DeliveryOptions();
     _deliveryOptions.addHeader("action", "query");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {

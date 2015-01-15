@@ -27,9 +27,17 @@ public interface SolrService {
     void stop();
 
     default void query(VertxSolrQuery query, Handler<AsyncResult<JsonObject>> resultHandler) {
-        query(query.toJson(), resultHandler);
+        query(query, null, resultHandler);
     }
 
-    void query(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler);
+    default void query(VertxSolrQuery query, QueryOptions options, Handler<AsyncResult<JsonObject>> resultHandler) {
+        query(query.toJson(), options, resultHandler);
+    }
+
+    default void query(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
+        query(query, null, resultHandler);
+    }
+
+    void query(JsonObject query, QueryOptions options, Handler<AsyncResult<JsonObject>> resultHandler);
 
 }

@@ -1,16 +1,16 @@
 package com.englishtown.vertx.solr.impl;
 
-import com.englishtown.vertx.solr.querybuilder.QueryBuilder;
+import com.englishtown.vertx.solr.QueryOptions;
 import com.englishtown.vertx.solr.SolrConfigurator;
 import com.englishtown.vertx.solr.SolrService;
 import com.englishtown.vertx.solr.VertxSolrQuery;
-import com.englishtown.vertx.solr.querybuilder.impl.DefaultQueryBuilder;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -46,17 +46,25 @@ public class DefaultSolrService implements SolrService {
     }
 
     @Override
-    public void query(JsonObject query, Handler<AsyncResult<JsonObject>> resultHandler) {
-        query(new VertxSolrQuery(query), resultHandler);
+    public void query(JsonObject query, QueryOptions options, Handler<AsyncResult<JsonObject>> resultHandler) {
+        query(new VertxSolrQuery(query), options, resultHandler);
     }
 
     @Override
-    public void query(VertxSolrQuery query, Handler<AsyncResult<JsonObject>> resultHandler) {
+    public void query(VertxSolrQuery query, QueryOptions options, Handler<AsyncResult<JsonObject>> resultHandler) {
 
         QueryResponse response;
 
+        if (options == null) {
+            options = new QueryOptions();
+        }
+
         try {
-            response = solrServer.query(query);
+            QueryRequest request = new QueryRequest(query);
+            if (options.getCore() != null) {
+                request.setPath("/" + options.getCore() + "/select");
+            }
+            response = request.process(solrServer);
         } catch (Throwable t) {
             resultHandler.handle(Future.failedFuture(t));
             return;

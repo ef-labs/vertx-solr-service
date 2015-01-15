@@ -20,7 +20,7 @@ public class SolrIntegrationTest extends SolrIntegrationTestBase {
         VertxSolrQuery query = new VertxSolrQuery();
         query.setQuery("*:*");
 
-        this.proxyService.query(query, result -> {
+        this.proxyService.query(query, queryOptions, result -> {
 
             if (result.failed()) {
                 result.cause().printStackTrace();
