@@ -1,9 +1,12 @@
 package com.englishtown.vertx.solr.impl;
 
 import com.englishtown.vertx.solr.SolrConfigurator;
+import org.apache.http.client.HttpClient;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.HttpClientUtil;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
@@ -19,6 +22,8 @@ public class JsonConfigSolrConfigurator implements SolrConfigurator {
     public static String CONFIG_SERVER_TYPE = "server_type";
     public static String CONFIG_SERVER_URL = "server_url";
     public static String CONFIG_SERVER_URLS = "server_urls";
+    private static String CONFIG_BASIC_USER_NAME = "username";
+    private static String CONFIG_BASIC_USER_PASS = "password";
 
     public static String DEFAULT_SERVER_TYPE = HttpSolrServer.class.getSimpleName();
 
@@ -49,14 +54,27 @@ public class JsonConfigSolrConfigurator implements SolrConfigurator {
     }
 
     private HttpSolrServer createHttpSolrServer() {
-
         String serverUrl = config.getString(CONFIG_SERVER_URL);
         if (serverUrl == null || serverUrl.isEmpty()) {
             throw new IllegalArgumentException("HttpSolrServer requires a " + CONFIG_SERVER_URL + " field");
         }
 
-        HttpSolrServer server = new HttpSolrServer(serverUrl);
-        return server;
+        String basicUserName = config.getString(CONFIG_BASIC_USER_NAME);
+        String basicUserPass = config.getString(CONFIG_BASIC_USER_PASS);
+
+        if (basicUserPass != null && !basicUserPass.isEmpty()
+                && basicUserName != null && !basicUserName.isEmpty()) {
+            ModifiableSolrParams params = new ModifiableSolrParams();
+            params.set(HttpClientUtil.PROP_MAX_CONNECTIONS, 128);
+            params.set(HttpClientUtil.PROP_MAX_CONNECTIONS_PER_HOST, 32);
+            params.set(HttpClientUtil.PROP_FOLLOW_REDIRECTS, false);
+            params.set(HttpClientUtil.PROP_BASIC_AUTH_USER, basicUserName);
+            params.set(HttpClientUtil.PROP_BASIC_AUTH_PASS, basicUserPass);
+            HttpClient httpClient = HttpClientUtil.createClient(params);
+            return new HttpSolrServer(serverUrl, httpClient);
+        } else {
+            return new HttpSolrServer(serverUrl);
+        }
     }
 
     private LBHttpSolrServer createLBHttpSolrServer() {
