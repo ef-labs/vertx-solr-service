@@ -14,6 +14,7 @@
  * under the License.
  */
 
+/** @module vertx-solr-service-js/solr_service */
 var utils = require('vertx-js/util/utils');
 
 var io = Packages.io;
@@ -24,13 +25,18 @@ var QueryOptions = com.englishtown.vertx.solr.QueryOptions;
 /**
  Vert.x solr service
 
-  @class
+ @class
 */
 var SolrService = function(j_val) {
 
   var j_solrService = j_val;
   var that = this;
 
+  /**
+
+   @public
+
+   */
   this.start = function() {
     var __args = arguments;
     if (__args.length === 0) {
@@ -38,6 +44,11 @@ var SolrService = function(j_val) {
     } else utils.invalidArgs();
   };
 
+  /**
+
+   @public
+
+   */
   this.stop = function() {
     var __args = arguments;
     if (__args.length === 0) {
@@ -45,6 +56,13 @@ var SolrService = function(j_val) {
     } else utils.invalidArgs();
   };
 
+  /**
+
+   @public
+   @param query {Object} 
+   @param options {Object} 
+   @param resultHandler {function} 
+   */
   this.query = function(query, options, resultHandler) {
     var __args = arguments;
     if (__args.length === 3 && typeof __args[0] === 'object' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
@@ -64,6 +82,13 @@ var SolrService = function(j_val) {
   this._jdel = j_solrService;
 };
 
+/**
+
+ @memberof module:vertx-solr-service-js/solr_service
+ @param vertx {Vertx} 
+ @param address {string} 
+ @return {SolrService}
+ */
 SolrService.createEventBusProxy = function(vertx, address) {
   var __args = arguments;
   if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'string') {
