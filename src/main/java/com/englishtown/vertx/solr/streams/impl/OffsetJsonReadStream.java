@@ -1,37 +1,37 @@
 package com.englishtown.vertx.solr.streams.impl;
 
+import com.englishtown.vertx.solr.SolrService;
+import io.vertx.core.json.JsonObject;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.vertx.java.core.json.JsonObject;
 
 /**
- * Implementation of {@link ReadJsonStreamBase} using an integer offset
+ * Implementation of {@link JsonReadStreamBase} using an integer offset
  * to paginate json Solr results
  */
-public class OffsetReadJsonStream extends ReadJsonStreamBase<OffsetReadJsonStream> {
+public class OffsetJsonReadStream extends JsonReadStreamBase {
 
     private int nextOffset;
 
-    public OffsetReadJsonStream() {
-        super();
+    public OffsetJsonReadStream(SolrService solrService) {
+        super(solrService);
     }
 
 
     // this method needs to be aware of pausing so that it can keep track of where it is when it resumes
     @Override
-    protected void setQueryStart(SolrQuery query) {
-
+    protected OffsetJsonReadStream setQueryStart(SolrQuery query) {
         query.setStart(nextOffset);
-
+        return this;
     }
 
     @Override
-    protected void handleReply(JsonObject reply) {
+    protected void handleResults(JsonObject reply) {
 
-        int count = reply.getArray("docs").size();
+        int count = reply.getJsonArray("docs").size();
         nextOffset += count;
 
         // Recall super
-        super.handleReply(reply);
+        super.handleResults(reply);
 
     }
 
@@ -40,7 +40,7 @@ public class OffsetReadJsonStream extends ReadJsonStreamBase<OffsetReadJsonStrea
 
         boolean complete = false;
         int numberFound = reply.getInteger("number_found");
-        int count = reply.getArray("docs").size();
+        int count = reply.getJsonArray("docs").size();
 
         if (nextOffset >= numberFound || count == 0) {
             complete = true;

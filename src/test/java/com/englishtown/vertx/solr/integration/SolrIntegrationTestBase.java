@@ -1,42 +1,60 @@
 package com.englishtown.vertx.solr.integration;
 
-import com.englishtown.vertx.solr.SolrQuerySerializer;
-import com.englishtown.vertx.solr.SolrVerticle;
-import com.englishtown.vertx.solr.impl.DefaultSolrQuerySerializer;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.testtools.TestVerticle;
+import com.englishtown.vertx.solr.QueryOptions;
+import com.englishtown.vertx.solr.SolrService;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.json.JsonObject;
+import io.vertx.test.core.VertxTestBase;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Solr base integration test
  */
-public abstract class SolrIntegrationTestBase extends TestVerticle {
+public abstract class SolrIntegrationTestBase extends VertxTestBase {
 
-    protected SolrQuerySerializer serializer = new DefaultSolrQuerySerializer();
+    public static final String EB_ADDRESS = "et.solr";
+
+    protected SolrService proxyService;
+    protected QueryOptions queryOptions;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void start(final Future<Void> startedResult) {
+    public void setUp() throws Exception {
+        super.setUp();
 
         JsonObject config = new JsonObject()
-                .putString("hk2_binder", "com.englishtown.vertx.solr.hk2.SolrBinder")
-                .putString("server_url", "http://localhost:8983/solr/collection1");
+                .put("address", EB_ADDRESS)
+                .put("hk2_binder", "com.englishtown.vertx.solr.hk2.SolrBinder")
+                .put("server_url", "http://localhost:8983/solr");
 
-        container.deployVerticle(SolrVerticle.class.getName(), config, new Handler<AsyncResult<String>>() {
-            @Override
-            public void handle(AsyncResult<String> result) {
-                if (result.succeeded()) {
-                    start();
-                    startedResult.setResult(null);
-                } else {
-                    startedResult.setFailure(result.cause());
-                }
+        this.queryOptions = new QueryOptions().setCore("collection1");
+
+        DeploymentOptions options = new DeploymentOptions()
+                .setConfig(config);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        vertx.deployVerticle("service:com.englishtown.vertx:vertx-solr-service", options, result -> {
+            if (result.failed()) {
+                result.cause().printStackTrace();
+                fail();
             }
+            latch.countDown();
         });
 
+        latch.await(2, TimeUnit.SECONDS);
+
+        proxyService = SolrService.createEventBusProxy(vertx, EB_ADDRESS);
+
     }
+
+    protected void handleThrowable(Throwable t) {
+        t.printStackTrace();
+        fail();
+    }
+
 }

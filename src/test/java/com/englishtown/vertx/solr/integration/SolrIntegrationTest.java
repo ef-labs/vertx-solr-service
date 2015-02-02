@@ -1,61 +1,52 @@
 package com.englishtown.vertx.solr.integration;
 
-import com.englishtown.vertx.solr.SolrVerticle;
-import org.apache.solr.client.solrj.SolrQuery;
+import com.englishtown.vertx.solr.VertxSolrQuery;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.junit.Test;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
-import static org.vertx.testtools.VertxAssert.*;
 
 /**
- * Integration tests for {@link com.englishtown.vertx.solr.SolrVerticle}
+ * Integration tests for {@link com.englishtown.vertx.solr.SolrServiceVerticle}
  */
 public class SolrIntegrationTest extends SolrIntegrationTestBase {
 
     @Test
-    public void testSolrVerticle() {
+    public void testQuery() {
 
-        SolrQuery query = new SolrQuery()
-                .setQuery("*:*");
+       /* SolrQueryOptions  query = new SolrQueryOptions()
+                .setQuery("*:*");*/
 
-        JsonObject message = new JsonObject()
-                .putString(SolrVerticle.FIELD_ACTION, SolrVerticle.FIELD_QUERY)
-                .putObject(SolrVerticle.FIELD_QUERY, serializer.serialize(query));
+        VertxSolrQuery query = new VertxSolrQuery();
+        query.setQuery("*:*");
 
-        vertx.eventBus().send(SolrVerticle.DEFAULT_ADDRESS, message, new Handler<Message<JsonObject>>() {
-            /**
-             * Something has happened, so handle it.
-             *
-             * @param reply
-             * The json reply from Solr
-             */
-            @Override
-            public void handle(Message<JsonObject> reply) {
+        this.proxyService.query(query, queryOptions, result -> {
 
-                JsonObject body = reply.body();
-                String status = body.getString("status");
-                assertEquals("ok", status);
-
-                Integer numberFound = body.getInteger("number_found");
-                Integer start = body.getInteger("start");
-                JsonArray docs = body.getArray("docs");
-
-                assertNotNull(numberFound);
-                assertNotNull(start);
-                assertNotNull(docs);
-
-                assertEquals(0, start.intValue());
-                assertTrue(numberFound > 0);
-                assertTrue(docs.size() > 0);
-
-                testComplete();
-
+            if (result.failed()) {
+                result.cause().printStackTrace();
+                fail();
+                return;
             }
+
+            JsonObject body = result.result();
+            assertNotNull(body);
+
+            Integer numberFound = body.getInteger("number_found");
+            Integer start = body.getInteger("start");
+            JsonArray docs = body.getJsonArray("docs");
+
+            assertNotNull(numberFound);
+            assertNotNull(start);
+            assertNotNull(docs);
+
+            assertEquals(0, start.intValue());
+            assertTrue(numberFound > 0);
+            assertTrue(docs.size() > 0);
+
+            testComplete();
         });
 
+        await();
     }
 
 }

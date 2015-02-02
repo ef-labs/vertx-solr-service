@@ -1,5 +1,8 @@
 package com.englishtown.vertx.solr.impl;
 
+import io.vertx.core.Context;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
@@ -8,9 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
@@ -24,21 +24,21 @@ public class JsonConfigSolrConfiguratorTest {
     JsonObject config = new JsonObject();
 
     @Mock
-    Container container;
+    Context container;
 
     @Before
     public void setUp() throws Exception {
 
         when(container.config()).thenReturn(config);
 
-        configurator = new JsonConfigSolrConfigurator(container);
+        configurator = new JsonConfigSolrConfigurator(container.config());
 
     }
 
     @Test
     public void testCreateSolrServer_HttpSolrServer() throws Exception {
 
-        config.putString(JsonConfigSolrConfigurator.CONFIG_SERVER_URL, "http://test.englishtown.com/solr");
+        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_URL, "http://test.englishtown.com/solr");
 
         SolrServer server = configurator.createSolrServer();
         assertThat(server, instanceOf(HttpSolrServer.class));
@@ -60,8 +60,9 @@ public class JsonConfigSolrConfiguratorTest {
     @Test
     public void testCreateSolrServer_LBHttpSolrServer() throws Exception {
 
-        config.putString(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, LBHttpSolrServer.class.getSimpleName());
-        config.putArray(JsonConfigSolrConfigurator.CONFIG_SERVER_URLS, new JsonArray().addString("http://test.englishtown.com/solr"));
+        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, LBHttpSolrServer.class.getSimpleName());
+        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_URLS
+                , new JsonArray().add("http://test.englishtown.com/solr"));
 
         SolrServer server = configurator.createSolrServer();
         assertThat(server, instanceOf(LBHttpSolrServer.class));
@@ -71,7 +72,7 @@ public class JsonConfigSolrConfiguratorTest {
     @Test
     public void testCreateSolrServer_LBHttpSolrServer_Fail() throws Exception {
 
-        config.putString(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, LBHttpSolrServer.class.getSimpleName());
+        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, LBHttpSolrServer.class.getSimpleName());
 
         try {
             configurator.createSolrServer();
@@ -85,7 +86,7 @@ public class JsonConfigSolrConfiguratorTest {
     @Test
     public void testCreateSolrServer_Invalid_SolrServer() throws Exception {
 
-        config.putString(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, this.getClass().getName());
+        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, this.getClass().getName());
 
         try {
             configurator.createSolrServer();
