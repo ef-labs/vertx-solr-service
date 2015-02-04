@@ -10,6 +10,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.impl.HttpClientUtil;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -57,6 +58,11 @@ public class DefaultSolrService implements SolrService {
 
         if (options == null) {
             options = new QueryOptions();
+        } else {
+            if (options.getBasicAuthUser() != null && options.getBasicAuthPass() != null) {
+                query.set(HttpClientUtil.PROP_BASIC_AUTH_USER, options.getBasicAuthUser());
+                query.set(HttpClientUtil.PROP_BASIC_AUTH_PASS, options.getBasicAuthPass());
+            }
         }
 
         try {
