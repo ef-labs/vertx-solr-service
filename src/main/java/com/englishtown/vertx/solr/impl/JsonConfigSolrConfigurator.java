@@ -77,7 +77,7 @@ public class JsonConfigSolrConfigurator implements SolrConfigurator {
         }
 
         try {
-            LBHttpSolrServer server = new LBHttpSolrServer(serverUrls);
+            LBHttpSolrServer server = new BasicAuthLBHttpSolrServer(serverUrls);
             return server;
 
         } catch (MalformedURLException e) {
