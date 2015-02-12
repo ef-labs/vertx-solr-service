@@ -1,6 +1,8 @@
 package com.englishtown.vertx.solr.impl;
 
+import com.englishtown.vertx.solr.VertxSolrServer;
 import io.vertx.core.Context;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.apache.solr.client.solrj.SolrServer;
@@ -24,6 +26,8 @@ public class JsonConfigSolrConfiguratorTest {
     JsonObject config = new JsonObject();
 
     @Mock
+    Vertx vertx;
+    @Mock
     Context container;
 
     @Before
@@ -31,7 +35,7 @@ public class JsonConfigSolrConfiguratorTest {
 
         when(container.config()).thenReturn(config);
 
-        configurator = new JsonConfigSolrConfigurator(container.config());
+        configurator = new JsonConfigSolrConfigurator(vertx, container.config());
 
     }
 
@@ -40,39 +44,13 @@ public class JsonConfigSolrConfiguratorTest {
 
         config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_URL, "http://test.englishtown.com/solr");
 
-        SolrServer server = configurator.createSolrServer();
-        assertThat(server, instanceOf(HttpSolrServer.class));
+        VertxSolrServer server = configurator.createSolrServer();
+        assertThat(server, instanceOf(DefaultVertxSolrServer.class));
 
     }
 
     @Test
     public void testCreateSolrServer_HttpSolrServer_Fail() throws Exception {
-
-        try {
-            configurator.createSolrServer();
-            fail();
-        } catch (IllegalArgumentException e) {
-            // expected
-        }
-
-    }
-
-    @Test
-    public void testCreateSolrServer_LBHttpSolrServer() throws Exception {
-
-        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, LBHttpSolrServer.class.getSimpleName());
-        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_URLS
-                , new JsonArray().add("http://test.englishtown.com/solr"));
-
-        SolrServer server = configurator.createSolrServer();
-        assertThat(server, instanceOf(LBHttpSolrServer.class));
-
-    }
-
-    @Test
-    public void testCreateSolrServer_LBHttpSolrServer_Fail() throws Exception {
-
-        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, LBHttpSolrServer.class.getSimpleName());
 
         try {
             configurator.createSolrServer();

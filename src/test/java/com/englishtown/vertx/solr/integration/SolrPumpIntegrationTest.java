@@ -89,9 +89,10 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 () -> {
                     for (JsonObject result : results) {
                         // check each result for a docs array and ensure number_found is greater than 0
-                        JsonArray docs = result.getJsonArray("docs");
+                        JsonObject response = result.getJsonObject("response");
+                        JsonArray docs = response.getJsonArray("docs");
                         assertNotNull(docs);
-                        Integer numberFound = result.getInteger("number_found");
+                        Integer numberFound = response.getInteger("numFound");
                         assertTrue(numberFound > 0);
                     }
                 },
@@ -116,9 +117,10 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 () -> {
                     for (JsonObject result : results) {
                         // check each result for a docs array and ensure number_found is greater than 0
-                        JsonArray docs = result.getJsonArray("docs");
+                        JsonObject response = result.getJsonObject("response");
+                        JsonArray docs = response.getJsonArray("docs");
                         assertNotNull(docs);
-                        Integer numberFound = result.getInteger("number_found");
+                        Integer numberFound = response.getInteger("numFound");
                         assertTrue(numberFound > 0);
                     }
                 },
@@ -145,9 +147,10 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 () -> {
                     for (JsonObject result : results) {
                         // check each result for a docs array and ensure number_found is greater than 0
-                        JsonArray docs = result.getJsonArray("docs");
+                        JsonObject response = result.getJsonObject("response");
+                        JsonArray docs = response.getJsonArray("docs");
                         assertNotNull(docs);
-                        Integer numberFound = result.getInteger("number_found");
+                        Integer numberFound = response.getInteger("numFound");
                         assertTrue(numberFound > 0);
                     }
                 },

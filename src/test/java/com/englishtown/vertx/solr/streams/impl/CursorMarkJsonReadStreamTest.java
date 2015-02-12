@@ -3,7 +3,6 @@ package com.englishtown.vertx.solr.streams.impl;
 import com.englishtown.vertx.solr.QueryOptions;
 import com.englishtown.vertx.solr.SolrService;
 import com.englishtown.vertx.solr.VertxSolrQuery;
-import com.englishtown.vertx.solr.querybuilder.Query;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -25,7 +24,8 @@ public class CursorMarkJsonReadStreamTest {
     CursorMarkJsonReadStream readJsonStream;
 
     // put into Message<JsonObject> used to simulate various reply messages from Solr
-    JsonObject messageBody = new JsonObject();
+    JsonObject result;
+    JsonObject response;
 
     @Captor
     ArgumentCaptor<Handler<AsyncResult<JsonObject>>> resultHandlerCaptor;
@@ -51,16 +51,19 @@ public class CursorMarkJsonReadStreamTest {
                 .exceptionHandler(exceptionHandler)
                 .endHandler(endHandler);
 
+        response = new JsonObject();
+        result = new JsonObject().put("response", response);
+
         when(jsonResult.succeeded()).thenReturn(true);
-        when(jsonResult.result()).thenReturn(messageBody);
+        when(jsonResult.result()).thenReturn(result);
     }
 
     @Test
     public void testDataHandler_doQuery_okStatus() {
 
         readJsonStream.handler(dataHandler);
-        messageBody
-                .put("number_found", 50)
+        response
+                .put("numFound", 50)
                 .put("next_cursor_mark", "test_cursor")
                 .put("docs", new JsonArray()
                         .add(new JsonObject()
@@ -84,7 +87,7 @@ public class CursorMarkJsonReadStreamTest {
         readJsonStream.handler(dataHandler);
         when(jsonResult.succeeded()).thenReturn(false);
 
-        messageBody.put("message", "defaultMessage");
+        result.put("message", "defaultMessage");
 
         verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
@@ -102,7 +105,7 @@ public class CursorMarkJsonReadStreamTest {
         readJsonStream.exceptionHandler(null);
         when(jsonResult.succeeded()).thenReturn(false);
 
-        messageBody.put("message", "defaultMessage");
+        result.put("message", "defaultMessage");
 
         verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
@@ -120,9 +123,8 @@ public class CursorMarkJsonReadStreamTest {
 
         readJsonStream.handler(null);
 
-        messageBody
-                .put("message", "default unit test message")
-                .put("number_found", 3)
+        response
+                .put("numFound", 3)
                 .put("next_cursor_mark", "test_cursor2")
                 .put("docs", new JsonArray()
                         .add(new JsonObject()
@@ -141,9 +143,9 @@ public class CursorMarkJsonReadStreamTest {
         readJsonStream.handler(dataHandler);
         readJsonStream.endHandler(null);
 
-        messageBody
+        response
                 .put("message", "default unit test message")
-                .put("number_found", 3)
+                .put("numFound", 3)
                 .put("next_cursor_mark", "test_cursor")
                 .put("docs", new JsonArray()
                         .add(new JsonObject()
@@ -156,7 +158,7 @@ public class CursorMarkJsonReadStreamTest {
 
         // we are not throwing any exceptions if the endHandler is null - passing in an endHandler is optional
         verifyZeroInteractions(exceptionHandler);
-        verify(dataHandler).handle(messageBody);
+        verify(dataHandler).handle(result);
         verifyZeroInteractions(endHandler);
 
     }
@@ -166,9 +168,9 @@ public class CursorMarkJsonReadStreamTest {
 
         // this test should test for the last page of results
         readJsonStream.handler(dataHandler);
-        messageBody
+        response
                 // pretending we have more results than we do in order to trigger the 2nd loop of doQuery
-                .put("number_found", 4)
+                .put("numFound", 4)
                 .put("next_cursor_mark", "test_cursor")
                         // empty array, which should trigger the endHandler
                 .put("docs", new JsonArray()
@@ -184,12 +186,12 @@ public class CursorMarkJsonReadStreamTest {
         // test with one result set that returns results
         verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
-        verify(dataHandler).handle(messageBody);
+        verify(dataHandler).handle(result);
         verifyZeroInteractions(exceptionHandler);
         verifyZeroInteractions(endHandler);
 
         // update test_cursor
-        messageBody
+        response
                 .put("next_cursor_mark", "test_cursor2")
                 .put("docs", new JsonArray()
                         .add(new JsonObject()
@@ -202,7 +204,7 @@ public class CursorMarkJsonReadStreamTest {
         verifyZeroInteractions(endHandler);
 
         // empty "docs" array, which should trigger the endHandler
-        messageBody
+        response
                 .put("next_cursor_mark", "test_cursor2")
                 .put("docs", new JsonArray());
         resultHandlerCaptor.getValue().handle(jsonResult);
@@ -218,8 +220,8 @@ public class CursorMarkJsonReadStreamTest {
         // this test should test for the last page of results
         readJsonStream.handler(dataHandler);
         // 0 results found, which should trigger the endHandler
-        messageBody
-                .put("number_found", 0)
+        response
+                .put("numFound", 0)
                 .put("next_cursor_mark", "*")
                 .put("docs", new JsonArray());
 
@@ -227,7 +229,7 @@ public class CursorMarkJsonReadStreamTest {
         verify(solrService).query(any(VertxSolrQuery.class), any(QueryOptions.class), resultHandlerCaptor.capture());
         resultHandlerCaptor.getValue().handle(jsonResult);
         // should still handle writing a response with nothing found
-        verify(dataHandler).handle(messageBody);
+        verify(dataHandler).handle(result);
         verifyZeroInteractions(exceptionHandler);
 
         verify(endHandler).handle(null);
@@ -250,8 +252,8 @@ public class CursorMarkJsonReadStreamTest {
     @Test
     public void testResume() {
 
-        messageBody.put("message", "default unit test message")
-                .put("number_found", 3)
+        response
+                .put("numFound", 3)
                 .put("next_cursor_mark", "test_cursor2")
                 .put("docs", new JsonArray()
                         .add(new JsonObject()
@@ -271,7 +273,7 @@ public class CursorMarkJsonReadStreamTest {
         resultHandlerCaptor.getValue().handle(jsonResult);
 
         verifyZeroInteractions(exceptionHandler);
-        verify(dataHandler).handle(messageBody);
+        verify(dataHandler).handle(result);
 
     }
 }

@@ -29,7 +29,7 @@ public class CursorMarkJsonReadStream extends JsonReadStreamBase {
     protected void handleResults(JsonObject reply) {
 
         this.currCursorMark = this.nextCursorMark;
-        this.nextCursorMark = reply.getString("next_cursor_mark");
+        this.nextCursorMark = reply.getJsonObject("response").getString("next_cursor_mark");
 
         // Recall super
         super.handleResults(reply);

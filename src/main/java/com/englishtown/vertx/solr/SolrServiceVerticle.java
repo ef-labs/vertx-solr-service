@@ -6,7 +6,7 @@ import io.vertx.serviceproxy.ProxyHelper;
 import javax.inject.Inject;
 
 /**
- * Solr client worker verticle
+ * Solr client verticle
  */
 public class SolrServiceVerticle extends AbstractVerticle {
 
