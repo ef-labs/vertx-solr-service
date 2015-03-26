@@ -10,7 +10,7 @@ import org.apache.solr.common.params.SolrParams;
 /**
  * Vert.x solr http server
  */
-public interface VertxSolrServer {
+public interface VertxSolrClient {
 
     void setInvariantParams(SolrParams params);
 

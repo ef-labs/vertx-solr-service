@@ -1,6 +1,5 @@
 package com.englishtown.vertx.solr.integration;
 
-import com.englishtown.vertx.solr.QueryOptions;
 import com.englishtown.vertx.solr.VertxSolrQuery;
 import com.englishtown.vertx.solr.streams.impl.OffsetJsonReadStream;
 import com.englishtown.vertx.solr.streams.impl.SolrPump;
@@ -98,7 +97,7 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 },
                 null);
 
-        query.setQuery("*:*").setRows(5);
+        query.setQuery("*:*").setRows(50);
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         // start the pump, which initializes the dataHandler
@@ -126,7 +125,7 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 },
                 () -> vertx.runOnContext(event -> offsetReadJsonStream.resume()));
 
-        query.setQuery("*:*").setRows(5);
+        query.setQuery("*:*").setRows(50);
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         solrPump.start();
@@ -156,7 +155,7 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 },
                 null);
 
-        query.setQuery("*:*").setRows(5);
+        query.setQuery("*:*").setRows(50);
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         // start the pump, which initializes the dataHandler

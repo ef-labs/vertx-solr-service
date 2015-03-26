@@ -5,6 +5,6 @@ package com.englishtown.vertx.solr;
  */
 public interface SolrConfigurator {
 
-    VertxSolrServer createSolrServer();
+    VertxSolrClient createSolrClient();
 
 }

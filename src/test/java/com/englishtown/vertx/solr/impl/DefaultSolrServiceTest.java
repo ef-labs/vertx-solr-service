@@ -2,14 +2,12 @@ package com.englishtown.vertx.solr.impl;
 
 import com.englishtown.vertx.solr.SolrConfigurator;
 import com.englishtown.vertx.solr.VertxSolrQuery;
-import com.englishtown.vertx.solr.VertxSolrServer;
+import com.englishtown.vertx.solr.VertxSolrClient;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,7 +30,7 @@ public class DefaultSolrServiceTest {
     @Mock
     SolrConfigurator configurator;
     @Mock
-    VertxSolrServer solrServer;
+    VertxSolrClient solrClient;
     @Mock
     Handler<AsyncResult<JsonObject>> asyncResultHandler;
     @Captor
@@ -42,7 +40,7 @@ public class DefaultSolrServiceTest {
     @Before
     public void setUp() throws Exception {
 
-        when(configurator.createSolrServer()).thenReturn(solrServer);
+        when(configurator.createSolrClient()).thenReturn(solrClient);
 
         service = new DefaultSolrService(configurator);
         service.start();
@@ -52,15 +50,15 @@ public class DefaultSolrServiceTest {
     @Test
     public void testStart() throws Exception {
         // start() is called from setUp
-        // just verify the configurator createSolrServer() was called
-        verify(configurator).createSolrServer();
+        // just verify the configurator createSolrClient() was called
+        verify(configurator).createSolrClient();
     }
 
     @Test
     public void testStop() throws Exception {
 
         service.stop();
-        verify(solrServer).stop();
+        verify(solrClient).stop();
 
     }
 
@@ -69,7 +67,7 @@ public class DefaultSolrServiceTest {
         VertxSolrQuery query = new VertxSolrQuery();
 
         service.query(query, asyncResultHandler);
-        verify(solrServer).request(any(), eq(asyncResultHandler));
+        verify(solrClient).request(any(), eq(asyncResultHandler));
     }
 
 }

@@ -16,7 +16,7 @@ import javax.inject.Inject;
 public class DefaultSolrService implements SolrService {
 
     private final SolrConfigurator configurator;
-    private VertxSolrServer solrServer;
+    private VertxSolrClient solrClient;
 
     @Inject
     public DefaultSolrService(SolrConfigurator configurator) {
@@ -25,14 +25,14 @@ public class DefaultSolrService implements SolrService {
 
     @Override
     public void start() {
-        solrServer = configurator.createSolrServer();
+        solrClient = configurator.createSolrClient();
     }
 
     @Override
     public void stop() {
-        if (solrServer != null) {
-            solrServer.stop();
-            solrServer = null;
+        if (solrClient != null) {
+            solrClient.stop();
+            solrClient = null;
         }
     }
 
@@ -59,7 +59,7 @@ public class DefaultSolrService implements SolrService {
                 request.setPath("/" + options.getCore() + "/select");
             }
 
-            solrServer.request(request, resultHandler);
+            solrClient.request(request, resultHandler);
 
         } catch (Throwable t) {
             resultHandler.handle(Future.failedFuture(t));

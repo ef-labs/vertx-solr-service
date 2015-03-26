@@ -1,6 +1,6 @@
 package com.englishtown.vertx.solr.impl;
 
-import com.englishtown.vertx.solr.VertxSolrServer;
+import com.englishtown.vertx.solr.VertxSolrClient;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -20,9 +20,9 @@ import java.net.URI;
 import java.util.Base64;
 
 /**
- * Default implementation of {@link com.englishtown.vertx.solr.VertxSolrServer}
+ * Default implementation of {@link VertxSolrClient}
  */
-public class DefaultVertxSolrServer implements VertxSolrServer {
+public class DefaultVertxSolrClient implements VertxSolrClient {
 
     private static final String DEFAULT_PATH = "/select";
     protected String baseUrl;
@@ -30,7 +30,7 @@ public class DefaultVertxSolrServer implements VertxSolrServer {
     protected ModifiableSolrParams invariantParams = new ModifiableSolrParams();
 
     @Inject
-    public DefaultVertxSolrServer(Vertx vertx, String baseUrl, HttpClientOptions options) {
+    public DefaultVertxSolrClient(Vertx vertx, String baseUrl, HttpClientOptions options) {
 
         if (baseUrl == null) {
             throw new IllegalArgumentException("The base URL cannot be null");

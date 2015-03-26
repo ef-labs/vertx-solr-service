@@ -1,13 +1,9 @@
 package com.englishtown.vertx.solr.impl;
 
-import com.englishtown.vertx.solr.VertxSolrServer;
+import com.englishtown.vertx.solr.VertxSolrClient;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.impl.LBHttpSolrServer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,20 +36,20 @@ public class JsonConfigSolrConfiguratorTest {
     }
 
     @Test
-    public void testCreateSolrServer_HttpSolrServer() throws Exception {
+    public void testCreateSolrClient() throws Exception {
 
         config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_URL, "http://test.englishtown.com/solr");
 
-        VertxSolrServer server = configurator.createSolrServer();
-        assertThat(server, instanceOf(DefaultVertxSolrServer.class));
+        VertxSolrClient server = configurator.createSolrClient();
+        assertThat(server, instanceOf(DefaultVertxSolrClient.class));
 
     }
 
     @Test
-    public void testCreateSolrServer_HttpSolrServer_Fail() throws Exception {
+    public void testCreateSolrClient_Fail() throws Exception {
 
         try {
-            configurator.createSolrServer();
+            configurator.createSolrClient();
             fail();
         } catch (IllegalArgumentException e) {
             // expected
@@ -62,12 +58,12 @@ public class JsonConfigSolrConfiguratorTest {
     }
 
     @Test
-    public void testCreateSolrServer_Invalid_SolrServer() throws Exception {
+    public void testCreateSolrClient_Invalid_SolrClient() throws Exception {
 
-        config.put(JsonConfigSolrConfigurator.CONFIG_SERVER_TYPE, this.getClass().getName());
+        config.put(JsonConfigSolrConfigurator.CONFIG_CLIENT_TYPE, this.getClass().getName());
 
         try {
-            configurator.createSolrServer();
+            configurator.createSolrClient();
             fail();
         } catch (IllegalArgumentException e) {
             // expected

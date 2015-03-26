@@ -1,7 +1,7 @@
 package com.englishtown.vertx.solr.integration;
 
 import com.englishtown.vertx.solr.SolrConfigurator;
-import com.englishtown.vertx.solr.VertxSolrServer;
+import com.englishtown.vertx.solr.VertxSolrClient;
 
 import static org.mockito.Mockito.mock;
 
@@ -10,10 +10,10 @@ import static org.mockito.Mockito.mock;
  */
 public class MockSolrConfigurator implements SolrConfigurator {
 
-    private VertxSolrServer solrServer = mock(VertxSolrServer.class);
+    private VertxSolrClient solrClient = mock(VertxSolrClient.class);
 
     @Override
-    public VertxSolrServer createSolrServer() {
-        return solrServer;
+    public VertxSolrClient createSolrClient() {
+        return solrClient;
     }
 }

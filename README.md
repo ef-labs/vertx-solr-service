@@ -5,13 +5,13 @@ The configuration options are as follows:
 ```
 {
     "hk2_binder" : <hk2_binder>,
-    "server_type": <server_type>,
+    "client_type": <client_type>,
     "server_url": <server_url>
 }
 ```
 
 * `hk2_binder` - The fully qualified path name of your hk2_binder. 
-* `server_type` - The type of vert.x Solr server, default is DefaultVertxSolrServer
+* `client_type` - The type of vert.x Solr client, default is DefaultVertxSolrClient
 * `server_url` - The url to your Solr installation.
 
 An an example configuration would be:

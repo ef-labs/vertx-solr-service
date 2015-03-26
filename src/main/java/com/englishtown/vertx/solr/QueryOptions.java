@@ -1,12 +1,12 @@
 package com.englishtown.vertx.solr;
 
-import io.vertx.codegen.annotations.Options;
+import io.vertx.codegen.annotations.DataObject;
 import io.vertx.core.json.JsonObject;
 
 /**
  * Vert.x service query options
  */
-@Options
+@DataObject
 public class QueryOptions {
 
     private String core;

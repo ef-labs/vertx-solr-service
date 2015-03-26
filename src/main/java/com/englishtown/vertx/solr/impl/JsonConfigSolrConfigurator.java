@@ -1,11 +1,10 @@
 package com.englishtown.vertx.solr.impl;
 
 import com.englishtown.vertx.solr.SolrConfigurator;
-import com.englishtown.vertx.solr.VertxSolrServer;
+import com.englishtown.vertx.solr.VertxSolrClient;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.json.JsonObject;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 import javax.inject.Inject;
 
@@ -14,11 +13,11 @@ import javax.inject.Inject;
  */
 public class JsonConfigSolrConfigurator implements SolrConfigurator {
 
-    public static final String CONFIG_SERVER_TYPE = "server_type";
+    public static final String CONFIG_CLIENT_TYPE = "client_type";
     public static final String CONFIG_SERVER_URL = "server_url";
     public static final String CONFIG_HTTP_CLIENT_OPTIONS = "http_client_options";
 
-    public static final String DEFAULT_SERVER_TYPE = HttpSolrServer.class.getSimpleName();
+    public static final String DEFAULT_CLIENT_TYPE = DefaultVertxSolrClient.class.getSimpleName();
 
     private Vertx vertx;
     private JsonObject config;
@@ -38,33 +37,31 @@ public class JsonConfigSolrConfigurator implements SolrConfigurator {
 
 
     @Override
-    public VertxSolrServer createSolrServer() {
+    public VertxSolrClient createSolrClient() {
 
-        String type = config.getString(CONFIG_SERVER_TYPE, DEFAULT_SERVER_TYPE);
+        String type = config.getString(CONFIG_CLIENT_TYPE, DEFAULT_CLIENT_TYPE);
 
-        if (type.equals(DefaultVertxSolrServer.class.getSimpleName())
-                || type.equals(DefaultVertxSolrServer.class.getName())
-                || type.equals(VertxSolrServer.class.getSimpleName())
-                || type.equals(VertxSolrServer.class.getName())
-                || type.equals(HttpSolrServer.class.getSimpleName())
-                || type.equals(HttpSolrServer.class.getName())) {
-            return createHttpSolrServer();
+        if (type.equals(DefaultVertxSolrClient.class.getSimpleName())
+                || type.equals(DefaultVertxSolrClient.class.getName())
+                || type.equals(VertxSolrClient.class.getSimpleName())
+                || type.equals(VertxSolrClient.class.getName())) {
+            return createVertxSolrClient();
         } else {
-            throw new IllegalArgumentException("Solr server type " + type + " is not supported");
+            throw new IllegalArgumentException("Solr client type " + type + " is not supported.  Try the default: " + DEFAULT_CLIENT_TYPE);
         }
 
     }
 
-    protected VertxSolrServer createHttpSolrServer() {
+    protected VertxSolrClient createVertxSolrClient() {
 
         String serverUrl = config.getString(CONFIG_SERVER_URL);
         if (serverUrl == null || serverUrl.isEmpty()) {
-            throw new IllegalArgumentException("DefaultVertxSolrServer requires a " + CONFIG_SERVER_URL + " field");
+            throw new IllegalArgumentException("DefaultVertxSolrClient requires a " + CONFIG_SERVER_URL + " field");
         }
 
         JsonObject clientOptions = config.getJsonObject(CONFIG_HTTP_CLIENT_OPTIONS, new JsonObject());
 
-        return new DefaultVertxSolrServer(vertx, serverUrl, new HttpClientOptions(clientOptions));
+        return new DefaultVertxSolrClient(vertx, serverUrl, new HttpClientOptions(clientOptions));
     }
 
 }
