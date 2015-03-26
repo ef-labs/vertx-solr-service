@@ -1,7 +1,7 @@
 {
     "main": "java-hk2:com.englishtown.vertx.solr.SolrServiceVerticle",
     "options": {
-        "worker": true,
-        "multiThreaded": true
+        "worker": false,
+        "multiThreaded": false
     }
 }

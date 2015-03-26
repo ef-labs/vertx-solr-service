@@ -134,6 +134,7 @@ public abstract class JsonReadStreamBase implements ReadStream<JsonObject> {
 
         // send this json message over the event bus with a reply handler.
         solrService.query(query, options, result -> {
+            queryRunning = false;
             try {
                 if (result.succeeded()) {
                     handleResults(result.result());
@@ -142,8 +143,6 @@ public abstract class JsonReadStreamBase implements ReadStream<JsonObject> {
                 }
             } catch (Throwable t) {
                 handleException(t);
-            } finally {
-                queryRunning = false;
             }
         });
 

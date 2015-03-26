@@ -31,16 +31,19 @@ public class SolrIntegrationTest extends SolrIntegrationTestBase {
             JsonObject body = result.result();
             assertNotNull(body);
 
-            Integer numberFound = body.getInteger("number_found");
-            Integer start = body.getInteger("start");
-            JsonArray docs = body.getJsonArray("docs");
+            JsonObject response = body.getJsonObject("response");
+            assertNotNull(response);
 
-            assertNotNull(numberFound);
+            Integer numFound = response.getInteger("numFound");
+            Integer start = response.getInteger("start");
+            JsonArray docs = response.getJsonArray("docs");
+
+            assertNotNull(numFound);
             assertNotNull(start);
             assertNotNull(docs);
 
             assertEquals(0, start.intValue());
-            assertTrue(numberFound > 0);
+            assertTrue(numFound > 0);
             assertTrue(docs.size() > 0);
 
             testComplete();

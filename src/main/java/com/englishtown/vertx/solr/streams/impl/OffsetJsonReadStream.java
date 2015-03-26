@@ -27,7 +27,9 @@ public class OffsetJsonReadStream extends JsonReadStreamBase {
     @Override
     protected void handleResults(JsonObject reply) {
 
-        int count = reply.getJsonArray("docs").size();
+        int count = reply.getJsonObject("response")
+                .getJsonArray("docs")
+                .size();
         nextOffset += count;
 
         // Recall super
@@ -39,8 +41,9 @@ public class OffsetJsonReadStream extends JsonReadStreamBase {
     protected boolean isComplete(JsonObject reply) {
 
         boolean complete = false;
-        int numberFound = reply.getInteger("number_found");
-        int count = reply.getJsonArray("docs").size();
+        JsonObject response = reply.getJsonObject("response");
+        int numberFound = response.getInteger("numFound");
+        int count = response.getJsonArray("docs").size();
 
         if (nextOffset >= numberFound || count == 0) {
             complete = true;

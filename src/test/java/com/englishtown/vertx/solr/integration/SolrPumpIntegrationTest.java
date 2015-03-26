@@ -1,6 +1,5 @@
 package com.englishtown.vertx.solr.integration;
 
-import com.englishtown.vertx.solr.QueryOptions;
 import com.englishtown.vertx.solr.VertxSolrQuery;
 import com.englishtown.vertx.solr.streams.impl.OffsetJsonReadStream;
 import com.englishtown.vertx.solr.streams.impl.SolrPump;
@@ -89,15 +88,16 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 () -> {
                     for (JsonObject result : results) {
                         // check each result for a docs array and ensure number_found is greater than 0
-                        JsonArray docs = result.getJsonArray("docs");
+                        JsonObject response = result.getJsonObject("response");
+                        JsonArray docs = response.getJsonArray("docs");
                         assertNotNull(docs);
-                        Integer numberFound = result.getInteger("number_found");
+                        Integer numberFound = response.getInteger("numFound");
                         assertTrue(numberFound > 0);
                     }
                 },
                 null);
 
-        query.setQuery("*:*").setRows(5);
+        query.setQuery("*:*").setRows(50);
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         // start the pump, which initializes the dataHandler
@@ -116,15 +116,16 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 () -> {
                     for (JsonObject result : results) {
                         // check each result for a docs array and ensure number_found is greater than 0
-                        JsonArray docs = result.getJsonArray("docs");
+                        JsonObject response = result.getJsonObject("response");
+                        JsonArray docs = response.getJsonArray("docs");
                         assertNotNull(docs);
-                        Integer numberFound = result.getInteger("number_found");
+                        Integer numberFound = response.getInteger("numFound");
                         assertTrue(numberFound > 0);
                     }
                 },
                 () -> vertx.runOnContext(event -> offsetReadJsonStream.resume()));
 
-        query.setQuery("*:*").setRows(5);
+        query.setQuery("*:*").setRows(50);
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         solrPump.start();
@@ -145,15 +146,16 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
                 () -> {
                     for (JsonObject result : results) {
                         // check each result for a docs array and ensure number_found is greater than 0
-                        JsonArray docs = result.getJsonArray("docs");
+                        JsonObject response = result.getJsonObject("response");
+                        JsonArray docs = response.getJsonArray("docs");
                         assertNotNull(docs);
-                        Integer numberFound = result.getInteger("number_found");
+                        Integer numberFound = response.getInteger("numFound");
                         assertTrue(numberFound > 0);
                     }
                 },
                 null);
 
-        query.setQuery("*:*").setRows(5);
+        query.setQuery("*:*").setRows(50);
 
         solrPump = SolrPump.createPump(offsetReadJsonStream, writeJsonStreamBase);
         // start the pump, which initializes the dataHandler
