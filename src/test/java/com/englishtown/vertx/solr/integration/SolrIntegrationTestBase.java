@@ -38,7 +38,7 @@ public abstract class SolrIntegrationTestBase extends VertxTestBase {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        vertx.deployVerticle("service:com.englishtown.vertx:vertx-solr-service", options, result -> {
+        vertx.deployVerticle("service:com.englishtown.vertx.vertx-solr-service", options, result -> {
             if (result.failed()) {
                 result.cause().printStackTrace();
                 fail();
