@@ -55,7 +55,7 @@ public class JsonConfigSolrConfigurator implements SolrConfigurator {
             throw new IllegalArgumentException("HttpSolrServer requires a " + CONFIG_SERVER_URL + " field");
         }
 
-        HttpSolrServer server = new HttpSolrServer(serverUrl);
+        HttpSolrServer server = new BasicAuthHttpSolrServer(serverUrl);
         return server;
     }
 
@@ -73,7 +73,7 @@ public class JsonConfigSolrConfigurator implements SolrConfigurator {
         }
 
         try {
-            LBHttpSolrServer server = new LBHttpSolrServer(serverUrls);
+            LBHttpSolrServer server = new BasicAuthLBHttpSolrServer(serverUrls);
             return server;
 
         } catch (MalformedURLException e) {
