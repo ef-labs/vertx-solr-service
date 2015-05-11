@@ -13,8 +13,8 @@
 
     <properties>
         <solrj.version>5.0.0</solrj.version>
-        <vertx.version>3.0.0-milestone4</vertx.version>
-        <vertx.hk2.version>2.0.0-RC3</vertx.hk2.version>
+        <vertx.version>3.0.0-milestone5</vertx.version>
+        <vertx.hk2.version>2.0.0-RC4</vertx.hk2.version>
 
         <!--Vert.x codegen does not play nice with maven-compiler-plugin 3.2-->
         <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
