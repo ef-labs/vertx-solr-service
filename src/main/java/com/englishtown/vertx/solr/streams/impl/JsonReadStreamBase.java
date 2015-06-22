@@ -6,7 +6,7 @@ import com.englishtown.vertx.solr.VertxSolrQuery;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.streams.ReadStream;
 import org.apache.solr.client.solrj.SolrQuery;
 
