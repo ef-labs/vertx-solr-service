@@ -22,7 +22,13 @@ import io.vertx.core.Vertx;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
-import java.util.ArrayList;import java.util.HashSet;import java.util.List;import java.util.Map;import java.util.Set;import io.vertx.serviceproxy.ProxyHelper;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import io.vertx.serviceproxy.ProxyHelper;
 import com.englishtown.vertx.solr.SolrService;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -58,7 +64,7 @@ public class SolrServiceVertxEBProxy implements SolrService {
     }
     JsonObject _json = new JsonObject();
     _json.put("query", query);
-    _json.put("options", options.toJson());
+    _json.put("options", options == null ? null : options.toJson());
     DeliveryOptions _deliveryOptions = new DeliveryOptions();
     _deliveryOptions.addHeader("action", "query");
     _vertx.eventBus().<JsonObject>send(_address, _json, _deliveryOptions, res -> {

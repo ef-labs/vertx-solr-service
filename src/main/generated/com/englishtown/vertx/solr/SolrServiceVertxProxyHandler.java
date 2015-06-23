@@ -20,12 +20,21 @@ import com.englishtown.vertx.solr.SolrService;
 import io.vertx.core.Vertx;
 import io.vertx.core.Handler;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
+import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.ReplyException;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
-import java.util.ArrayList;import java.util.HashSet;import java.util.List;import java.util.Map;import java.util.Set;import java.util.UUID;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import io.vertx.serviceproxy.ProxyHelper;
 import io.vertx.serviceproxy.ProxyHandler;
 import com.englishtown.vertx.solr.SolrService;
@@ -41,17 +50,25 @@ import com.englishtown.vertx.solr.QueryOptions;
 */
 public class SolrServiceVertxProxyHandler extends ProxyHandler {
 
+  public static final long DEFAULT_CONNECTION_TIMEOUT = 5 * 60; // 5 minutes 
+
   private final Vertx vertx;
   private final SolrService service;
-  private final String address;
   private final long timerID;
   private long lastAccessed;
   private final long timeoutSeconds;
 
-  public SolrServiceVertxProxyHandler(Vertx vertx, SolrService service, String address, boolean topLevel, long timeoutSeconds) {
+  public SolrServiceVertxProxyHandler(Vertx vertx, SolrService service) {
+    this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);  }
+
+  public SolrServiceVertxProxyHandler(Vertx vertx, SolrService service,
+    long timeoutInSecond) {
+    this(vertx, service, true, timeoutInSecond);
+  }
+
+  public SolrServiceVertxProxyHandler(Vertx vertx, SolrService service, boolean topLevel, long timeoutSeconds) {
     this.vertx = vertx;
     this.service = service;
-    this.address = address;
     this.timeoutSeconds = timeoutSeconds;
     if (timeoutSeconds != -1 && !topLevel) {
       long period = timeoutSeconds * 1000 / 2;
@@ -63,6 +80,12 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
       this.timerID = -1;
     }
     accessed();
+  }
+
+  public MessageConsumer<JsonObject> registerHandler(String address) {
+    MessageConsumer<JsonObject> consumer = vertx.eventBus().<JsonObject>consumer(address).handler(this);
+    this.setConsumer(consumer);
+    return consumer;
   }
 
   private void checkTimedOut(long id) {
@@ -102,7 +125,7 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
         break;
       }
       case "query": {
-        service.query((io.vertx.core.json.JsonObject)json.getValue("query"), new com.englishtown.vertx.solr.QueryOptions(json.getJsonObject("options")), createHandler(msg));
+        service.query((io.vertx.core.json.JsonObject)json.getValue("query"), json.getJsonObject("options") == null ? null : new com.englishtown.vertx.solr.QueryOptions(json.getJsonObject("options")), createHandler(msg));
         break;
       }
       default: {
