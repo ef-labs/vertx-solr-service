@@ -16,6 +16,7 @@
 
 /** @module vertx-solr-service-js/solr_service */
 var utils = require('vertx-js/util/utils');
+var Vertx = require('vertx-js/vertx');
 
 var io = Packages.io;
 var JsonObject = io.vertx.core.json.JsonObject;
@@ -41,7 +42,7 @@ var SolrService = function(j_val) {
     var __args = arguments;
     if (__args.length === 0) {
       j_solrService["start()"]();
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -53,7 +54,7 @@ var SolrService = function(j_val) {
     var __args = arguments;
     if (__args.length === 0) {
       j_solrService["stop()"]();
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   /**
@@ -73,7 +74,7 @@ var SolrService = function(j_val) {
         resultHandler(null, ar.cause());
       }
     });
-    } else utils.invalidArgs();
+    } else throw new TypeError('function invoked with invalid arguments');
   };
 
   // A reference to the underlying Java delegate
@@ -93,7 +94,7 @@ SolrService.createEventBusProxy = function(vertx, address) {
   var __args = arguments;
   if (__args.length === 2 && typeof __args[0] === 'object' && __args[0]._jdel && typeof __args[1] === 'string') {
     return utils.convReturnVertxGen(JSolrService["createEventBusProxy(io.vertx.core.Vertx,java.lang.String)"](vertx._jdel, address), SolrService);
-  } else utils.invalidArgs();
+  } else throw new TypeError('function invoked with invalid arguments');
 };
 
 // We export the Constructor function

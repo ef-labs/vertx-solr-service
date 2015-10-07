@@ -59,10 +59,10 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
   private final long timeoutSeconds;
 
   public SolrServiceVertxProxyHandler(Vertx vertx, SolrService service) {
-    this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);  }
+    this(vertx, service, DEFAULT_CONNECTION_TIMEOUT);
+  }
 
-  public SolrServiceVertxProxyHandler(Vertx vertx, SolrService service,
-    long timeoutInSecond) {
+  public SolrServiceVertxProxyHandler(Vertx vertx, SolrService service, long timeoutInSecond) {
     this(vertx, service, true, timeoutInSecond);
   }
 
@@ -108,31 +108,37 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
   }
 
   public void handle(Message<JsonObject> msg) {
-    JsonObject json = msg.body();
-    String action = msg.headers().get("action");
-    if (action == null) {
-      throw new IllegalStateException("action not specified");
-    }
-    accessed();
-    switch (action) {
+    try {
+      JsonObject json = msg.body();
+      String action = msg.headers().get("action");
+      if (action == null) {
+        throw new IllegalStateException("action not specified");
+      }
+      accessed();
+      switch (action) {
 
-      case "start": {
-        service.start();
-        break;
+        case "start": {
+          service.start();
+          break;
+        }
+        case "stop": {
+          service.stop();
+          break;
+        }
+        case "query": {
+          service.query((io.vertx.core.json.JsonObject)json.getValue("query"), json.getJsonObject("options") == null ? null : new com.englishtown.vertx.solr.QueryOptions(json.getJsonObject("options")), createHandler(msg));
+          break;
+        }
+        default: {
+          throw new IllegalStateException("Invalid action: " + action);
+        }
       }
-      case "stop": {
-        service.stop();
-        break;
-      }
-      case "query": {
-        service.query((io.vertx.core.json.JsonObject)json.getValue("query"), json.getJsonObject("options") == null ? null : new com.englishtown.vertx.solr.QueryOptions(json.getJsonObject("options")), createHandler(msg));
-        break;
-      }
-      default: {
-        throw new IllegalStateException("Invalid action: " + action);
-      }
+    } catch (Throwable t) {
+      msg.fail(-1, t.getMessage());
+      throw t;
     }
   }
+
   private <T> Handler<AsyncResult<T>> createHandler(Message msg) {
     return res -> {
       if (res.failed()) {
@@ -142,6 +148,7 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
       }
     };
   }
+
   private <T> Handler<AsyncResult<List<T>>> createListHandler(Message msg) {
     return res -> {
       if (res.failed()) {
@@ -151,6 +158,7 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
       }
     };
   }
+
   private <T> Handler<AsyncResult<Set<T>>> createSetHandler(Message msg) {
     return res -> {
       if (res.failed()) {
@@ -160,6 +168,7 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
       }
     };
   }
+
   private Handler<AsyncResult<List<Character>>> createListCharHandler(Message msg) {
     return res -> {
       if (res.failed()) {
@@ -167,12 +176,13 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
       } else {
         JsonArray arr = new JsonArray();
         for (Character chr: res.result()) {
-          arr.add((int)chr);
+          arr.add((int) chr);
         }
         msg.reply(arr);
       }
     };
   }
+
   private Handler<AsyncResult<Set<Character>>> createSetCharHandler(Message msg) {
     return res -> {
       if (res.failed()) {
@@ -180,18 +190,21 @@ public class SolrServiceVertxProxyHandler extends ProxyHandler {
       } else {
         JsonArray arr = new JsonArray();
         for (Character chr: res.result()) {
-          arr.add((int)chr);
+          arr.add((int) chr);
         }
         msg.reply(arr);
       }
     };
   }
+
   private <T> Map<String, T> convertMap(Map map) {
     return (Map<String, T>)map;
   }
+
   private <T> List<T> convertList(List list) {
     return (List<T>)list;
   }
+
   private <T> Set<T> convertSet(List list) {
     return new HashSet<T>((List<T>)list);
   }

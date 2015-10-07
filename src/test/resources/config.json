@@ -1,5 +1,6 @@
 {
     "hk2_binder": "com.englishtown.vertx.solr.hk2.SolrBinder",
 
-    "server_url": "http://localhost:8983/solr"
+    "address": "et.solr",
+    "server_url": "${solr.url}"
 }
