@@ -1,0 +1,19 @@
+= Cheatsheets
+
+[[QueryOptions]]
+== QueryOptions
+
+++++
+ Vert.x service query options
+++++
+'''
+
+[cols=">25%,^25%,50%"]
+[frame="topbot"]
+|===
+^|Name | Type ^| Description
+|[[basicAuthPass]]`basicAuthPass`|`String`|-
+|[[basicAuthUser]]`basicAuthUser`|`String`|-
+|[[core]]`core`|`String`|-
+|===
+

@@ -6,6 +6,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
 
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -26,10 +27,7 @@ public abstract class SolrIntegrationTestBase extends VertxTestBase {
     public void setUp() throws Exception {
         super.setUp();
 
-        JsonObject config = new JsonObject()
-                .put("address", EB_ADDRESS)
-                .put("hk2_binder", "com.englishtown.vertx.solr.hk2.SolrBinder")
-                .put("server_url", "http://localhost:8983/solr");
+        JsonObject config = readJson("config.json");
 
         this.queryOptions = new QueryOptions().setCore("collection1");
 
@@ -55,6 +53,17 @@ public abstract class SolrIntegrationTestBase extends VertxTestBase {
     protected void handleThrowable(Throwable t) {
         t.printStackTrace();
         fail();
+    }
+
+    protected JsonObject readJson(String path) {
+
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        try (Scanner scanner = new Scanner(cl.getResourceAsStream(path)).useDelimiter("\\A")) {
+            String s = scanner.next();
+            return new JsonObject(s);
+        }
+
     }
 
 }

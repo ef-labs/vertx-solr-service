@@ -1,3 +1,8 @@
+## Vert.x Solr Service
+Vert.x 3 solr service with event bus proxying.
+
+TODO: Update the documents for vert.x 3 service proxying.
+
 ##Configuration
 
 The configuration options are as follows:
