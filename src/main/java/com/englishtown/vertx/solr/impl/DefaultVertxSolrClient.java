@@ -63,6 +63,11 @@ public class DefaultVertxSolrClient implements VertxSolrClient {
         }
 
         String path = request.getPath();
+
+        if (null != request.getParams().get("collection")){
+        	path = "/" + request.getParams().get("collection") + "/select";
+        }
+        
         if (path == null || !path.startsWith("/")) {
             path = DEFAULT_PATH;
         }
