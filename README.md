@@ -1,6 +1,8 @@
 ## Vert.x Solr Service
 Vert.x 3 solr service with event bus proxying.
 
+[![Build Status](https://travis-ci.org/ef-labs/vertx-solr-service.png)](https://travis-ci.org/ef-labs/vertx-solr-service)
+
 TODO: Update the documents for vert.x 3 service proxying.
 
 ##Configuration
