@@ -1,7 +1,8 @@
 ## Vert.x Solr Service
 Vert.x 3 solr service with event bus proxying.
 
-[![Build Status](https://travis-ci.org/ef-labs/vertx-solr-service.png)](https://travis-ci.org/ef-labs/vertx-solr-service)
+[![Build Status](http://img.shields.io/travis/ef-labs/vertx-solr-service.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/ef-labs/vertx-solr-service)
+[![Maven Central](https://img.shields.io/maven-central/v/com.englishtown.vertx/vertx-solr-service.svg?maxAge=2592000&style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-solr-service/)
 
 TODO: Update the documents for vert.x 3 service proxying.
 
