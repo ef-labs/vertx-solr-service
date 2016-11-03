@@ -10,7 +10,6 @@ import io.vertx.core.json.JsonObject;
 import org.apache.solr.client.solrj.SolrRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpClientUtil;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.solr.common.params.SolrParams;
@@ -80,7 +79,7 @@ public class DefaultVertxSolrClient implements VertxSolrClient {
         params.remove(HttpClientUtil.PROP_BASIC_AUTH_USER);
         params.remove(HttpClientUtil.PROP_BASIC_AUTH_PASS);
 
-        URI uri = URI.create(baseUrl + path + ClientUtils.toQueryString(params, false));
+        URI uri = URI.create(baseUrl + path + params.toQueryString());
         int port = uri.getPort() > 0 ? uri.getPort() : ("https".equals(uri.getScheme()) ? 443 : 80);
 
         HttpClientRequest httpRequest = httpClient.request(HttpMethod.GET, port, uri.getHost(), uri.getPath() + "?" + uri.getQuery());
