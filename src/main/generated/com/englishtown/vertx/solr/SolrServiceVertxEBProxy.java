@@ -28,7 +28,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.function.Function;
 import io.vertx.serviceproxy.ProxyHelper;
+import io.vertx.serviceproxy.ServiceException;
+import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import com.englishtown.vertx.solr.SolrService;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -40,6 +43,7 @@ import com.englishtown.vertx.solr.QueryOptions;
   Generated Proxy code - DO NOT EDIT
   @author Roger the Robot
 */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SolrServiceVertxEBProxy implements SolrService {
 
   private Vertx _vertx;
@@ -55,6 +59,10 @@ public class SolrServiceVertxEBProxy implements SolrService {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
+    try {
+      this._vertx.eventBus().registerDefaultCodec(ServiceException.class,
+          new ServiceExceptionMessageCodec());
+    } catch (IllegalStateException ex) {}
   }
 
   public void start() {
@@ -102,12 +110,44 @@ public class SolrServiceVertxEBProxy implements SolrService {
   }
 
   private <T> Map<String, T> convertMap(Map map) {
-    return (Map<String, T>)map;
+    if (map.isEmpty()) { 
+      return (Map<String, T>) map; 
+    } 
+     
+    Object elem = map.values().stream().findFirst().get(); 
+    if (!(elem instanceof Map) && !(elem instanceof List)) { 
+      return (Map<String, T>) map; 
+    } else { 
+      Function<Object, T> converter; 
+      if (elem instanceof List) { 
+        converter = object -> (T) new JsonArray((List) object); 
+      } else { 
+        converter = object -> (T) new JsonObject((Map) object); 
+      } 
+      return ((Map<String, T>) map).entrySet() 
+       .stream() 
+       .collect(Collectors.toMap(Map.Entry::getKey, converter::apply)); 
+    } 
   }
   private <T> List<T> convertList(List list) {
-    return (List<T>)list;
+    if (list.isEmpty()) { 
+          return (List<T>) list; 
+        } 
+     
+    Object elem = list.get(0); 
+    if (!(elem instanceof Map) && !(elem instanceof List)) { 
+      return (List<T>) list; 
+    } else { 
+      Function<Object, T> converter; 
+      if (elem instanceof List) { 
+        converter = object -> (T) new JsonArray((List) object); 
+      } else { 
+        converter = object -> (T) new JsonObject((Map) object); 
+      } 
+      return (List<T>) list.stream().map(converter).collect(Collectors.toList()); 
+    } 
   }
   private <T> Set<T> convertSet(List list) {
-    return new HashSet<T>((List<T>)list);
+    return new HashSet<T>(convertList(list));
   }
 }

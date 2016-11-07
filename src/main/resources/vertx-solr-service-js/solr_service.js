@@ -66,7 +66,7 @@ var SolrService = function(j_val) {
    */
   this.query = function(query, options, resultHandler) {
     var __args = arguments;
-    if (__args.length === 3 && typeof __args[0] === 'object' && typeof __args[1] === 'object' && typeof __args[2] === 'function') {
+    if (__args.length === 3 && (typeof __args[0] === 'object' && __args[0] != null) && (typeof __args[1] === 'object' && __args[1] != null) && typeof __args[2] === 'function') {
       j_solrService["query(io.vertx.core.json.JsonObject,com.englishtown.vertx.solr.QueryOptions,io.vertx.core.Handler)"](utils.convParamJsonObject(query), options != null ? new QueryOptions(new JsonObject(JSON.stringify(options))) : null, function(ar) {
       if (ar.succeeded()) {
         resultHandler(utils.convReturnJson(ar.result()), null);

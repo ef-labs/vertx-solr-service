@@ -14,10 +14,23 @@
     <properties>
         <solrj.version>6.2.1</solrj.version>
         <vertx.hk2.version>2.4.0</vertx.hk2.version>
+        <vertx.version>3.3.3</vertx.version>
 
         <!--Vert.x codegen does not play nice with maven-compiler-plugin 3.2-->
         <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-dependencies</artifactId>
+                <version>${vertx.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -34,18 +47,15 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-service-proxy</artifactId>
-            <version>${vertx.version}</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-codegen</artifactId>
-            <version>${vertx.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-lang-js</artifactId>
-            <version>${vertx.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -58,7 +68,6 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-service-factory</artifactId>
-            <version>${vertx.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -103,12 +112,14 @@
             </activation>
             <properties>
                 <solr.url>http://dockerhost:8983/solr</solr.url>
+                <solr.core>gettingstarted</solr.core>
             </properties>
         </profile>
         <profile>
             <id>localhost</id>
             <properties>
                 <solr.url>http://localhost:8983/solr</solr.url>
+                <solr.core>collection1</solr.core>
             </properties>
         </profile>
         <profile>
@@ -121,6 +132,7 @@
             </activation>
             <properties>
                 <solr.url>http://localhost:8983/solr</solr.url>
+                <solr.core>collection1</solr.core>
             </properties>
         </profile>
     </profiles>

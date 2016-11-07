@@ -185,3 +185,14 @@ An example result message would be:
     }
 }
 ```
+
+
+## Docker
+
+Set up a running docker solr container with the following:
+
+```
+docker run --name my_solr -d -p 8983:8983 -t solr:6.2.1-alpine
+docker exec -it --user=solr my_solr bin/solr create_core -c gettingstarted
+docker exec -it --user=solr my_solr bin/post -c gettingstarted example/exampledocs/manufacturers.xml
+```

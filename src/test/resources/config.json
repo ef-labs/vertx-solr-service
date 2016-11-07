@@ -2,5 +2,6 @@
     "hk2_binder": "com.englishtown.vertx.solr.hk2.SolrBinder",
 
     "address": "et.solr",
-    "server_url": "${solr.url}"
+    "server_url": "${solr.url}",
+    "solr_core": "${solr.core}"
 }

@@ -29,7 +29,8 @@ public abstract class SolrIntegrationTestBase extends VertxTestBase {
 
         JsonObject config = readJson("config.json");
 
-        this.queryOptions = new QueryOptions().setCore("collection1");
+        String core = config.getString("solr_core", "collection1");
+        this.queryOptions = new QueryOptions().setCore(core);
 
         DeploymentOptions options = new DeploymentOptions()
                 .setConfig(config);

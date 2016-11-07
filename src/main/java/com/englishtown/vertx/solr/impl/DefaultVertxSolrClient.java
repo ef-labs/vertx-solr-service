@@ -99,8 +99,8 @@ public class DefaultVertxSolrClient implements VertxSolrClient {
                     }
 
                     String contentType = response.headers().get(HttpHeaders.CONTENT_TYPE);
-                    if (contentType == null || !contentType.startsWith("application/json")) {
-                        resultHandler.handle(Future.failedFuture(new SolrServerException("Recieved content type " + contentType)));
+                    if (contentType == null || !(contentType.startsWith("application/json") || contentType.startsWith("text/plain"))) {
+                        resultHandler.handle(Future.failedFuture(new SolrServerException("Received content type " + contentType)));
                         return;
                     }
 
