@@ -47,6 +47,11 @@ public class SolrPumpIntegrationTest extends SolrIntegrationTestBase {
             }
 
             @Override
+            public void end() {
+
+            }
+
+            @Override
             public WriteStream<JsonObject> setWriteQueueMaxSize(int maxSize) {
                 return this;
             }

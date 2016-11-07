@@ -29,6 +29,11 @@ public class BufferJsonWriteStream implements WriteStream<JsonObject> {
     }
 
     @Override
+    public void end() {
+        stream.end();
+    }
+
+    @Override
     public WriteStream<JsonObject> setWriteQueueMaxSize(int maxSize) {
         stream.setWriteQueueMaxSize(maxSize);
         return this;
