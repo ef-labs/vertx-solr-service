@@ -46,12 +46,26 @@ public class JsonConfigSolrConfigurator implements SolrConfigurator {
                 || type.equals(VertxSolrClient.class.getSimpleName())
                 || type.equals(VertxSolrClient.class.getName())) {
             return createVertxSolrClient();
+        } else if (type.equals(CloudVertxSolrClient.class.getName()) 
+        		|| type.equals(CloudVertxSolrClient.class.getSimpleName())) {
+            return createCloudVertxSolrClient();
         } else {
             throw new IllegalArgumentException("Solr client type " + type + " is not supported.  Try the default: " + DEFAULT_CLIENT_TYPE);
         }
 
     }
 
+    protected VertxSolrClient createCloudVertxSolrClient() {
+    	String serverUrl = config.getString(CONFIG_SERVER_URL);
+        if (serverUrl == null || serverUrl.isEmpty()) {
+            throw new IllegalArgumentException("CloudVertxSolrClient requires a " + CONFIG_SERVER_URL + " field");
+        }
+
+        JsonObject clientOptions = config.getJsonObject(CONFIG_HTTP_CLIENT_OPTIONS, new JsonObject());
+
+        return new CloudVertxSolrClient(vertx, serverUrl);
+	}
+    
     protected VertxSolrClient createVertxSolrClient() {
 
         String serverUrl = config.getString(CONFIG_SERVER_URL);

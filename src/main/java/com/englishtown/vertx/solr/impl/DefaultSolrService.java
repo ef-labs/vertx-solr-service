@@ -54,11 +54,13 @@ public class DefaultSolrService implements SolrService {
         }
 
         try {
-            QueryRequest request = new QueryRequest(query);
-            if (options.getCore() != null) {
-                request.setPath("/" + options.getCore() + "/select");
+        	
+        	if (options.getCore() != null) {
+        		query.set("collection", options.getCore());
             }
-
+        	
+            QueryRequest request = new QueryRequest(query);
+            
             solrClient.request(request, resultHandler);
 
         } catch (Throwable t) {
